@@ -20,7 +20,7 @@ class MyContainer extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 3),
+        border: Border.all(color: Colors.green, width: 3),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Column(children: [SizedBox(height: 20), icon, role]),
