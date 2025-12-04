@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:farm_express/screens/choose_role_screen.dart';
+import 'package:farm_express/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 1000),
           pageBuilder: (context, animation, secondaryAnimation) =>
-              const ChooseRoleScreen(),
+              const OnboardingScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
