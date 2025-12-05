@@ -18,7 +18,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       "title": "Fresh from farms",
       "desc":
           "Get fresh vegetables, fruits and dairy products directly from farms.",
-      "image": "assets/images/vegetables.jpg",
+      "image": "assets/images/vegetable.jpg",
     },
     {
       "title": "Fast and Safe Delivery",
@@ -34,6 +34,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(),
       body: Container(
@@ -53,7 +54,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 child: Text(
                   "Skip",
-                  style: TextStyle(fontSize: 20, color: Colors.blueAccent),
+                  style: TextStyle(fontSize: 18, color: Colors.blueAccent),
                 ),
               ),
             ),
@@ -68,44 +69,47 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   });
                 },
                 itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10,
-                              offset: Offset(0, 5),
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 10,
+                                offset: Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              _data[index]["image"]!,
+                              height: size.height * 0.50,
+                              fit: BoxFit.cover,
                             ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            _data[index]["image"]!,
-                            fit: BoxFit.cover,
                           ),
                         ),
-                      ),
 
-                      Text(
-                        _data[index]["title"]!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: kPrimaryColor,
+                        Text(
+                          _data[index]["title"]!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: kPrimaryColor,
+                          ),
                         ),
-                      ),
-                      Text(
-                        _data[index]["desc"]!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 15, color: Colors.black),
-                      ),
-                    ],
+                        Text(
+                          _data[index]["desc"]!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 15, color: Colors.black),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
