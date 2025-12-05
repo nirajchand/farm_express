@@ -1,7 +1,4 @@
-import 'package:farm_express/screens/choose_role_screen.dart';
-import 'package:farm_express/screens/login_screen.dart';
-import 'package:farm_express/screens/onboarding_screen.dart';
-import 'package:farm_express/screens/signup_screen.dart';
+
 import 'package:farm_express/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
