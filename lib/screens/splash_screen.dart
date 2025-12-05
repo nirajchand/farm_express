@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:farm_express/constants/colors.dart';
 import 'package:farm_express/screens/choose_role_screen.dart';
 import 'package:farm_express/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,17 +16,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Timer(const Duration(seconds: 1), () {
+    Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 1000),
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const OnboardingScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
+        MaterialPageRoute(builder: (context) => OnboardingScreen()),
       );
     });
   }
@@ -33,21 +27,29 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
-      body: Center(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(color: Colors.white),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.agriculture, size: 100, color: Colors.white),
-            SizedBox(height: 20),
+            Spacer(),
+            Image.asset("assets/images/project_logo.png", width: 200),
+            Spacer(),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+              strokeWidth: 4,
+            ),
+            SizedBox(height: 16),
             Text(
-              "Farmers",
+              "Loading..",
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
               ),
             ),
+            SizedBox(height: 50),
           ],
         ),
       ),

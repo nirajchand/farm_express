@@ -24,16 +24,13 @@ class MyElevatedButton extends StatelessWidget {
         foregroundColor: foregroundColor,
         padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(5),
+          borderRadius: BorderRadiusGeometry.circular(20),
         ),
       ),
-      child: Row(
-        children: [
-          Text(
-            text,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ],
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
     );
   }

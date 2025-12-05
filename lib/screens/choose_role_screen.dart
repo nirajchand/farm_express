@@ -1,4 +1,4 @@
-import 'package:farm_express/screens/consumer_login_screen.dart';
+import 'package:farm_express/screens/login_screen.dart';
 import 'package:farm_express/widgets/my_container.dart';
 import 'package:flutter/material.dart';
 
@@ -23,22 +23,32 @@ class ChooseRoleScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              MyContainer(
-                height: 200,
-                width: 170,
-                role: Text(
-                  "I'm\nfarmer",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(),
+                    ),
+                  );
+                },
+                child: MyContainer(
+                  height: 200,
+                  width: 170,
+                  role: Text(
+                    "I'm\nfarmer",
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  icon: Image.asset("assets/icons/primary.png"),
                 ),
-                icon: Image.asset("assets/icons/primary.png"),
               ),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ConsumerLoginScreen(),
+                      builder: (context) => LoginScreen(),
                     ),
                   );
                 },
