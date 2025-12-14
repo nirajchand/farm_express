@@ -1,9 +1,15 @@
 import 'package:farm_express/constants/colors.dart';
 import 'package:flutter/material.dart';
 
-class BottonNavigationScreen extends StatelessWidget {
+class BottonNavigationScreen extends StatefulWidget {
   const BottonNavigationScreen({super.key});
 
+  @override
+  State<BottonNavigationScreen> createState() => _BottonNavigationScreenState();
+}
+
+class _BottonNavigationScreenState extends State<BottonNavigationScreen> {
+  int _selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +29,7 @@ class BottonNavigationScreen extends StatelessWidget {
         ),
 
         child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: kPrimaryColor,
           unselectedItemColor: Colors.black,
@@ -47,6 +54,11 @@ class BottonNavigationScreen extends StatelessWidget {
             ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
           ],
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
         ),
       ),
     );
