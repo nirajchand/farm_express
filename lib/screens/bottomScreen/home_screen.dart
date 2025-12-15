@@ -6,16 +6,23 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: 10,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.80,
-      ),
-      itemBuilder: (context, index) {
-        return MyCard();
-      },
+    return Column(
+      children: [
+        Image.asset("assets/images/farmers.png"),
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: 10,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.80,
+            ),
+            itemBuilder: (context, index) {
+              return MyCard();
+            },
+          ),
+        ),
+      ],
     );
   }
 }
