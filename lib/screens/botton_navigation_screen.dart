@@ -1,4 +1,8 @@
 import 'package:farm_express/constants/colors.dart';
+import 'package:farm_express/screens/bottomScreen/cart_screen.dart';
+import 'package:farm_express/screens/bottomScreen/explore_screen.dart';
+import 'package:farm_express/screens/bottomScreen/home_screen.dart';
+import 'package:farm_express/screens/bottomScreen/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class BottonNavigationScreen extends StatefulWidget {
@@ -10,56 +14,46 @@ class BottonNavigationScreen extends StatefulWidget {
 
 class _BottonNavigationScreenState extends State<BottonNavigationScreen> {
   int _selectedIndex = 0;
+
+  List<Widget> lstBottomScreen = [
+    HomeScreen(),
+    ExploreScreen(),
+    CartScreen(),
+    ProfileScreen(),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 8,
-              offset: Offset(6, 6),
-            ),
-          ],
+      backgroundColor: Colors.white,
+      body: SafeArea(child: lstBottomScreen[_selectedIndex]),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: kPrimaryColor,
+        unselectedItemColor: Colors.black,
+        iconSize: 30,
+        selectedLabelStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
-
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: kPrimaryColor,
-          unselectedItemColor: Colors.black,
-          iconSize: 30,
-          selectedLabelStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-          unselectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.explore),
-              label: "Explore",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_bag),
-              label: "Cart",
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          ],
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
+        unselectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
         ),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explore"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag),
+            label: "Cart",
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }
