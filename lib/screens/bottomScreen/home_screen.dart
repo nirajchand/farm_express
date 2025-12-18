@@ -30,7 +30,11 @@ class HomeScreen extends StatelessWidget {
           SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [CategoryChip(), CategoryChip(), CategoryChip()],
+            children: [
+              CategoryChip(categoryName: "Fruits"),
+              CategoryChip(categoryName: "Grains"),
+              CategoryChip(categoryName: "Vegetables"),
+            ],
           ),
           SizedBox(height: 10),
           Align(
@@ -43,14 +47,19 @@ class HomeScreen extends StatelessWidget {
           SizedBox(height: 10),
 
           Expanded(
-            child: GridView.builder(
-              itemCount: 10,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.80,
-              ),
-              itemBuilder: (context, index) {
-                return MyCard();
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                int crossAxisCount = constraints.maxWidth > 600 ? 4 : 2;
+                return GridView.builder(
+                  itemCount: 10,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: 0.80,
+                  ),
+                  itemBuilder: (context, index) {
+                    return MyCard();
+                  },
+                );
               },
             ),
           ),
