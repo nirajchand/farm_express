@@ -2,7 +2,14 @@ import 'package:farm_express/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class CategoryChip extends StatelessWidget {
-  const CategoryChip({super.key});
+  const CategoryChip({
+    super.key,
+    required this.categoryName,
+    this.categoryImage,
+  });
+
+  final String categoryName;
+  final Image? categoryImage;
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +27,13 @@ class CategoryChip extends StatelessWidget {
             backgroundColor: Colors.white,
             child: ClipRRect(
               borderRadius: BorderRadiusGeometry.circular(50),
-              child: Image.asset("assets/images/fruits.jpg", width: 18),
+              child: categoryImage ?? 
+              Image.asset("assets/images/fruits.jpg"),
             ),
           ),
           const SizedBox(width: 8),
           Text(
-            "Fruits",
+            categoryName,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ],

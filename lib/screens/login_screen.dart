@@ -1,4 +1,5 @@
 import 'package:farm_express/constants/colors.dart';
+import 'package:farm_express/screens/botton_navigation_screen.dart';
 import 'package:farm_express/screens/dashboard_screen.dart';
 import 'package:farm_express/screens/signup_screen.dart';
 import 'package:farm_express/widgets/elevated_button.dart';
@@ -96,13 +97,13 @@ class _ConsumerLoginScreenState extends State<LoginScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DashboardScreen(),
+                              builder: (context) => BottonNavigationScreen(),
                             ),
                           );
                         });
                       },
-                      backgroundColor: kPrimaryColor,
-                      foregroundColor: Colors.white,
+                      // backgroundColor: kPrimaryColor,
+                      // foregroundColor: Colors.white,
                       text: "Sign In to Your Account",
                     ),
                     SizedBox(height: 10),
