@@ -5,23 +5,30 @@ class MyElevatedButton extends StatelessWidget {
   const MyElevatedButton({
     super.key,
     required this.onPressed,
-    required this.backgroundColor,
-    required this.foregroundColor,
+    this.backgroundColor,
+    this.foregroundColor,
     required this.text,
   });
-
   final String text;
   final VoidCallback onPressed;
-  final Color backgroundColor;
-  final Color foregroundColor;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
+        backgroundColor:
+            backgroundColor ??
+            Theme.of(
+              context,
+            ).elevatedButtonTheme.style?.backgroundColor?.resolve({}),
+        foregroundColor:
+            foregroundColor ??
+            Theme.of(
+              context,
+            ).elevatedButtonTheme.style?.foregroundColor?.resolve({}),
         padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(20),
