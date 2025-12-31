@@ -1,0 +1,8 @@
+import 'package:dartz/dartz.dart';
+import 'package:farm_express/core/error/failures.dart';
+import 'package:farm_express/features/auth/domain/entities/auth_entity.dart';
+
+abstract interface class AuthRepository {
+  Future<Either<Failure, bool>> registerUser(AuthEntity user);
+  Future<Either<Failure, AuthEntity>> loginUser(String email, String password);
+}
