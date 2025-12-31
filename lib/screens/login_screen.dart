@@ -1,4 +1,4 @@
-import 'package:farm_express/constants/colors.dart';
+import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/screens/botton_navigation_screen.dart';
 import 'package:farm_express/screens/dashboard_screen.dart';
 import 'package:farm_express/screens/signup_screen.dart';

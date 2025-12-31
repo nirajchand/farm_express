@@ -1,4 +1,4 @@
-import 'package:farm_express/constants/colors.dart';
+import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/screens/login_screen.dart';
 import 'package:farm_express/widgets/elevated_button.dart';
 import 'package:farm_express/widgets/my_text_form_field.dart';

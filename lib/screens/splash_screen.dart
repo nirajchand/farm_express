@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:farm_express/constants/colors.dart';
+import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/screens/choose_role_screen.dart';
 import 'package:farm_express/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';

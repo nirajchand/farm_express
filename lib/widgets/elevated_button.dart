@@ -1,4 +1,4 @@
-import 'package:farm_express/constants/colors.dart';
+import 'package:farm_express/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class MyElevatedButton extends StatelessWidget {
