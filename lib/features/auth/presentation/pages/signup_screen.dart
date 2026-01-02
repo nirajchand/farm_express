@@ -35,7 +35,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     }
   }
 
-
   @override
   void dispose() {
     _fullNameController.dispose();
@@ -58,7 +57,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             backgroundColor: Colors.red,
           ),
         );
-      }else if (next.status == AuthStatus.registered) {
+      } else if (next.status == AuthStatus.registered) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Registration Successful! Please login.'),
@@ -120,6 +119,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           Icons.person_3_rounded,
                           color: kPrimaryColor,
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your full name';
+                          }
+                          return null;
+                        },
                       ),
                       SizedBox(height: 10),
                       MyTextFormField(
