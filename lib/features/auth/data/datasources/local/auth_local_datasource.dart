@@ -4,9 +4,10 @@ import 'package:farm_express/features/auth/data/models/auth_hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Provider
-// final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
-//   final hiveService = ref.watch(h)
-// });
+final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
+  final hiveService = ref.watch(hiveServiceProvider);
+  return AuthLocalDatasource(hiveService: hiveService);
+});
 
 class AuthLocalDatasource implements IAuthDatasource {
   final HiveService _hiveService;

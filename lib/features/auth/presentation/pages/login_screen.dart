@@ -9,7 +9,6 @@ import 'package:farm_express/widgets/my_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -22,7 +21,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formkey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
 
   Future<void> _login() async {
     if (_formkey.currentState!.validate()) {
@@ -51,9 +49,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       } else if (next.status == AuthStatus.authenticated) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => DashboardScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => DashboardScreen()),
         );
       }
     });
@@ -110,7 +106,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: TextStyle(color: Colors.blueGrey),
                         ),
                         prefixIcon: Icon(Icons.email, color: kPrimaryColor),
-                        
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          return null;
+                        },
                       ),
                       SizedBox(height: 15),
                       MyTextFormField(
@@ -121,6 +122,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Icons.visibility_off,
                           color: kPrimaryColor,
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          return null;
+                        },
                       ),
                       Align(
                         alignment: Alignment.centerRight,
@@ -153,7 +160,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 10),
-                  
+
                       ElevatedButton.icon(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
@@ -181,7 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                       ),
-                  
+
                       SizedBox(height: 20),
                       TextButton(
                         onPressed: () {

@@ -6,17 +6,22 @@ class MyTextFormField extends StatelessWidget {
     required this.labelText,
     this.hint,
     this.prefixIcon,
-    this.suffixiocn,
+    this.suffixiocn, this.controller, this.validator,
+
   });
 
+  final TextEditingController? controller;
   final String labelText;
   final Text? hint;
   final Icon? prefixIcon;
   final Icon? suffixiocn;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
+      validator: validator,
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),

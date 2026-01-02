@@ -3,9 +3,9 @@ import 'package:farm_express/features/auth/domain/usecases/register_usecases.dar
 import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final authViewModelProvider =
-    NotifierProvider<AuthViewModel, AuthState>(() => AuthViewModel());
-
+final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
+  () => AuthViewModel(),
+);
 
 class AuthViewModel extends Notifier<AuthState> {
   late final RegisterUsecase _registerUsecase;
@@ -41,16 +41,13 @@ class AuthViewModel extends Notifier<AuthState> {
         );
       },
       (success) {
-        state = state.copyWith(status: AuthStatus.unauthenticated);
+        state = state.copyWith(status: AuthStatus.registered);
       },
     );
   }
 
-  // Login 
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
+  // Login
+  Future<void> login({required String email, required String password}) async {
     state = state.copyWith(status: AuthStatus.loading);
     final params = LoginUsecasesParams(email: email, password: password);
     final result = await _loginUsecases.call(params);
