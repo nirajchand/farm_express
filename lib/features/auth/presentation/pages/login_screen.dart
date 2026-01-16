@@ -49,7 +49,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       } else if (next.status == AuthStatus.authenticated) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardScreen()),
+          MaterialPageRoute(builder: (context) => BottonNavigationScreen()),
         );
       }
     });
