@@ -1,7 +1,7 @@
 
-import 'package:farm_express/features/consumer_profile/domain/usecases/get_consumer_profile_usecases.dart';
-import 'package:farm_express/features/consumer_profile/domain/usecases/update_consumer_profile_Usecase.dart';
-import 'package:farm_express/features/consumer_profile/presentation/state/consumer_profile_state.dart';
+import 'package:farm_express/features/consumer/consumer_profile/domain/usecases/get_consumer_profile_usecases.dart';
+import 'package:farm_express/features/consumer/consumer_profile/domain/usecases/update_consumer_profile_usecase.dart';
+import 'package:farm_express/features/consumer/consumer_profile/presentation/state/consumer_profile_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final consumerProfileViewmodelProvider =

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:farm_express/features/consumer_profile/domain/entities/profile_entity.dart';
+import 'package:farm_express/features/consumer/consumer_profile/domain/entities/profile_entity.dart';
 
 enum ConsumerProfileStatus {
   initial,
