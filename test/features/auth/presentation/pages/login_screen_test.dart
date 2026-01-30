@@ -88,7 +88,7 @@ void main() {
       await tester.tap(find.byType(ElevatedButton));
       await tester.pump();
 
-      expect(find.text('Please enter your email'), findsOneWidget);
+      expect(find.text('Please ent53er your email'), findsOneWidget);
     });
   });
 

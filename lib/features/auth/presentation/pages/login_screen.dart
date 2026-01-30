@@ -104,7 +104,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       SizedBox(height: 20),
                       MyTextFormField(
                         controller: _emailController,
-                        labelText: "Emaaddressil ",
+                        labelText: "Email address ",
                         hint: Text(
                           "e.g abc123@gmail.com",
                           style: TextStyle(color: Colors.blueGrey),
