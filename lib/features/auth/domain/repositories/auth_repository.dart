@@ -5,4 +5,5 @@ import 'package:farm_express/features/auth/domain/entities/auth_entity.dart';
 abstract interface class IAuthRepository {
   Future<Either<Failure, bool>> registerUser(AuthEntity user);
   Future<Either<Failure, AuthEntity>> loginUser(String email, String password);
+  Future<Either<Failure, bool>> logout();
 }

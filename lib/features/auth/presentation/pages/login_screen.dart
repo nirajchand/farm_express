@@ -1,9 +1,10 @@
 import 'package:farm_express/core/constants/colors.dart';
+import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
 import 'package:farm_express/features/auth/presentation/view_model/auth_view_model.dart';
-import 'package:farm_express/screens/botton_navigation_screen.dart';
-import 'package:farm_express/screens/dashboard_screen.dart';
+import 'package:farm_express/features/consumer/dashboard/presentation/pages/botton_navigation_screen.dart';
 import 'package:farm_express/features/auth/presentation/pages/signup_screen.dart';
+import 'package:farm_express/features/farmer/farmer_dashboard/presentation/pages/farmer_dashboard.dart';
 import 'package:farm_express/widgets/elevated_button.dart';
 import 'package:farm_express/widgets/my_text_form_field.dart';
 import 'package:flutter/material.dart';
@@ -36,21 +37,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // auth State
-    final authState = ref.watch(authViewModelProvider);
+    // final authState = ref.watch(authViewModelProvider);
 
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next.status == AuthStatus.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage ?? 'Login Failed'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackbarUtils.showError(context, next.errorMessage ?? "Login Failed!");
       } else if (next.status == AuthStatus.authenticated) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => BottonNavigationScreen()),
-        );
+        final role = next.user!.userType;
+        if (role == 'consumer') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => BottonNavigationScreen()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => FarmerDashboard()),
+          );
+        }
       }
     });
     return Scaffold(
@@ -100,7 +104,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       SizedBox(height: 20),
                       MyTextFormField(
                         controller: _emailController,
-                        labelText: "Email address",
+                        labelText: "Emaaddressil ",
                         hint: Text(
                           "e.g abc123@gmail.com",
                           style: TextStyle(color: Colors.blueGrey),

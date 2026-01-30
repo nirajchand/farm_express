@@ -1,8 +1,8 @@
 import 'package:farm_express/core/constants/colors.dart';
-import 'package:farm_express/screens/bottomScreen/cart_screen.dart';
-import 'package:farm_express/screens/bottomScreen/explore_screen.dart';
-import 'package:farm_express/screens/bottomScreen/home_screen.dart';
-import 'package:farm_express/screens/bottomScreen/profile_screen.dart';
+import 'package:farm_express/features/consumer/consumer_profile/presentation/pages/profile_screen.dart';
+import 'package:farm_express/features/consumer/dashboard/presentation/pages/bottomScreen/cart_screen.dart';
+import 'package:farm_express/features/consumer/dashboard/presentation/pages/bottomScreen/explore_screen.dart';
+import 'package:farm_express/features/consumer/dashboard/presentation/pages/bottomScreen/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class BottonNavigationScreen extends StatefulWidget {

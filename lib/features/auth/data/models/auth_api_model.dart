@@ -1,5 +1,5 @@
-
 import 'package:farm_express/features/auth/domain/entities/auth_entity.dart';
+import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
 
 class AuthApiModel {
   final String? id;
@@ -7,7 +7,7 @@ class AuthApiModel {
   final String email;
   final String? password;
   final String? confirmPassword;
-  final String? role;
+  final String role;
 
   AuthApiModel({
     this.id,
@@ -15,8 +15,8 @@ class AuthApiModel {
     required this.email,
     this.password,
     this.confirmPassword,
-    String? role,
-  }): role = role ?? "consumer" ;
+    required this.role,
+  });
 
   // to json
   Map<String, dynamic> toJson() {
@@ -29,15 +29,15 @@ class AuthApiModel {
     };
   }
 
-  // from json 
-  factory AuthApiModel.fromJson(Map<String,dynamic> json){
+  // from json
+  factory AuthApiModel.fromJson(Map<String, dynamic> json) {
     return AuthApiModel(
       id: json["_id"] as String,
       fullName: json['fullName'] as String,
       email: json["email"] as String,
       password: json["password"] as String,
       confirmPassword: json["password"] as String,
-      role: json["role"] as String
+      role: json["role"] as String,
     );
   }
   // From entity
@@ -48,6 +48,7 @@ class AuthApiModel {
       email: entity.email,
       password: entity.password,
       confirmPassword: entity.confirmPassword,
+      role: entity.userType,
     );
   }
 
@@ -59,6 +60,7 @@ class AuthApiModel {
       email: email,
       password: password,
       confirmPassword: confirmPassword,
+      userType: role
     );
   }
 

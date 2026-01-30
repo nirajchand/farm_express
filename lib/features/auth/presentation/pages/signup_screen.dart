@@ -1,4 +1,5 @@
 import 'package:farm_express/core/constants/colors.dart';
+import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/auth/presentation/pages/login_screen.dart';
 import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
 import 'package:farm_express/features/auth/presentation/view_model/auth_view_model.dart';
@@ -46,24 +47,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // auth State
-    final authState = ref.watch(authViewModelProvider);
 
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next.status == AuthStatus.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage ?? 'Registration Failed'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackbarUtils.showError(context, next.errorMessage!);
       } else if (next.status == AuthStatus.registered) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registration Successful! Please login.'),
-            backgroundColor: Colors.green,
-          ),
+        SnackbarUtils.showSuccess(
+          context,
+          "Registration successful! Please login.",
         );
+        Navigator.of(context).pop();
       }
     });
 

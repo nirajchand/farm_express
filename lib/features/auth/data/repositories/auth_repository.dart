@@ -72,19 +72,6 @@ class AuthRepository implements IAuthRepository {
     }
   }
 
-  // @override
-  // Future<Either<Failure, bool>> registerUser(AuthEntity user) async {
-  //   try{
-  //     final model = AuthHiveModel.fromEntity(user);
-  //     final result = await _authDatasource.registerUser(model);
-  //     if(result.success){
-  //       return Right(true);
-  //     }
-  //     return Left(LocalDatabaseFailure(message: "Failed to register user"));
-  //   }catch(e){
-  //     return Left(LocalDatabaseFailure(message: e.toString()));
-  //   }
-  // }
 
   @override
   Future<Either<Failure, bool>> registerUser(AuthEntity user) async {
@@ -116,6 +103,19 @@ class AuthRepository implements IAuthRepository {
           LocalDatabaseFailure(message: "Unexpected error: ${e.toString()}"),
         );
       }
+    }
+  }
+  
+  @override
+  Future<Either<Failure, bool>> logout() async {
+    try {
+      final result = await _authDatasource.logout();
+      if (result) {
+        return const Right(true);
+      }
+      return const Left(LocalDatabaseFailure(message: "Failed to logout"));
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }
 }

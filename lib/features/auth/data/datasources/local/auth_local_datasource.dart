@@ -1,24 +1,41 @@
 import 'package:farm_express/core/services/hive/hive_service.dart';
+import 'package:farm_express/core/services/storage/user_session_service.dart';
 import 'package:farm_express/features/auth/data/datasources/auth_datasource.dart';
 import 'package:farm_express/features/auth/data/models/auth_hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Provider
 final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
-  final hiveService = ref.watch(hiveServiceProvider);
-  return AuthLocalDatasource(hiveService: hiveService);
+  final hiveService = ref.read(hiveServiceProvider);
+  final userSeesionService = ref.read(userSessionServiceProvider);
+  return AuthLocalDatasource(
+    hiveService: hiveService,
+    userSessionService: userSeesionService,
+  );
 });
 
 class AuthLocalDatasource implements IAuthLocalDatasource {
   final HiveService _hiveService;
+  final UserSessionService _userSessionService;
 
-  AuthLocalDatasource({required HiveService hiveService})
-    : _hiveService = hiveService;
+  AuthLocalDatasource({
+    required HiveService hiveService,
+    required UserSessionService userSessionService,
+  }) : _hiveService = hiveService,
+       _userSessionService = userSessionService;
 
   @override
   Future<AuthHiveModel?> loginUser(String email, String password) async {
     try {
       final user = await _hiveService.loginUser(email, password);
+      if (user != null) {
+        await _userSessionService.saveUserSession(
+          userId: user.userId!,
+          email: user.email,
+          fullName: user.fullName,
+          role: user.userType
+        );
+      }
       return Future.value(user);
     } catch (e) {
       return Future.value(null);
@@ -32,6 +49,16 @@ class AuthLocalDatasource implements IAuthLocalDatasource {
       return user;
     } catch (e) {
       rethrow;
+    }
+  }
+  
+  @override
+  Future<bool> logout() async {
+    try {
+      await _userSessionService.clearSession();
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

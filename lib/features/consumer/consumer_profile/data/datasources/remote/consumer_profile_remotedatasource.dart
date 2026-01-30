@@ -35,18 +35,6 @@ class ConsumerProfileRemotedatasource
     final fileName = image?.path.split("/").last;
     final token = await _tokenService.getToken();
 
-    // final formData = FormData.fromMap({
-    //   "fullName": data.fullName,
-    //   "email": data.email,
-    //   "phoneNumber": data.phoneNumber,
-    //   "userLocation": data.location,
-    //   if (image != null)
-    //     "profile_image": await MultipartFile.fromFile(
-    //       image.path,
-    //       filename: fileName,
-    //     ),
-    // });
-
     final formData = FormData.fromMap({
       if (data.fullName != null) "fullName": data.fullName,
       if (data.email != null) "email": data.email,
