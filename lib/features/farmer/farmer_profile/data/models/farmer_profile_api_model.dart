@@ -1,6 +1,5 @@
 
 import 'package:farm_express/features/farmer/farmer_profile/domain/entities/farmer_profile_entity.dart';
-import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'farmer_profile_api_model.g.dart';
@@ -29,8 +28,7 @@ class FarmerProfileApiModel {
 
   factory FarmerProfileApiModel.fromJson(Map<String, dynamic> json) => _$FarmerProfileApiModelFromJson(json);
   Map<String, dynamic> toJson() => _$FarmerProfileApiModelToJson(this);
-
-
+  
   FarmerProfileEntity toEntity() {
     return FarmerProfileEntity(
       fullName: fullName,
