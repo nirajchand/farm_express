@@ -6,6 +6,7 @@ import 'package:farm_express/core/api/app_client.dart';
 import 'package:farm_express/core/services/storage/token_service.dart';
 import 'package:farm_express/features/product/data/datasources/product_datasources.dart';
 import 'package:farm_express/features/product/data/models/product_api_model.dart';
+import 'package:farm_express/features/product/data/models/product_fetch_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final productRemoteDataSourceProvider = Provider<ProductRemoteDataSource>((
@@ -33,7 +34,7 @@ class ProductRemoteDataSource implements IProductRemoteDataSource {
   }
 
   @override
-  Future<List<ProductApiModel>> getAllProducts() async {
+  Future<List<ProductFetchModel>> getAllProducts() async {
     final token = await _tokenService.getToken();
 
     final responseJson = await _apiClient.get(
@@ -42,13 +43,21 @@ class ProductRemoteDataSource implements IProductRemoteDataSource {
     );
     final data = responseJson.data['data'] as List;
 
-    return data.map((json) => ProductApiModel.fromJson(json)).toList();
+    return data.map((json) => ProductFetchModel.fromJson(json)).toList();
 
   }
 
   @override
-  Future<List<ProductApiModel>> getProductsByFarmerId(String farmerId) {
-    throw UnimplementedError();
+  Future<List<ProductApiModel>> getProductsByFarmerId() async {
+    final token = await _tokenService.getToken();
+
+    final reponseJson = await _apiClient.get(
+      ApiEndpoints.getProductsByFarmerId,
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    final data = reponseJson.data['data'] as List;
+    return data.map((json) => ProductApiModel.fromJson(json)).toList();
   }
 
   @override

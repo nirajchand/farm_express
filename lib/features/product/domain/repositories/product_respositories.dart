@@ -10,5 +10,5 @@ abstract class IProductRepository {
   Future<Either<Failure, List<ProductEntities>>> getAllProducts();
   Future<Either<Failure, ProductEntities>> updateProduct(ProductEntities data);
   Future<Either<Failure, void>> deleteProduct(String productId);
-  Future<Either<Failure, List<ProductEntities>>> getProductsByFarmerId(String farmerId);
+  Future<Either<Failure, List<ProductEntities>>> getProductsByFarmerId();
 }

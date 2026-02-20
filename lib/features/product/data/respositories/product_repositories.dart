@@ -57,9 +57,14 @@ class ProductRepositories implements IProductRepository {
   }
 
   @override
-  Future<Either<Failure, List<ProductEntities>>> getProductsByFarmerId(String farmerId) {
-    // TODO: implement getProductsByFarmerId
-    throw UnimplementedError();
+  Future<Either<Failure, List<ProductEntities>>> getProductsByFarmerId() async {
+    try {
+      final response = await _iProductRemoteDataSource.getProductsByFarmerId();
+      return Right(response.map((e) => e.toEntity()).toList());
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+
   }
 
   @override
