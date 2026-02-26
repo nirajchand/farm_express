@@ -32,12 +32,12 @@ class OrderRepository implements IOrderRepository {
   }
 
   @override
-  Future<Either<Failure, OrderEntity>> placeOrder(OrderEntity order) {
+  Future<Either<Failure, bool>> placeOrder(OrderEntity order) {
     try {
       final orderModel = OrderModel.fromEntity(order);
       return _iRemoteOrderDataSource
           .placeOrder(orderModel)
-          .then((response) => Right(response.toEntity()));
+          .then((response) => Right(response));
     } catch (e) {
       return Future.value(Left(ServerFailure(message: e.toString())));
     }

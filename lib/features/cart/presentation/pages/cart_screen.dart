@@ -69,6 +69,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               final price = product.price ?? 0;
               double quantity = item.quantity ?? 0;
               final total = price * quantity;
+              final unitType = product.unitType ?? '';
 
               return Card(
                 elevation: 3,
@@ -79,19 +80,23 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Product Image
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Image.network(
                           "${ApiEndpoints.serverUrl}${product.productImage ?? ''}",
-                          width: 80,
-                          height: 80,
+                          width: 75,
+                          height: 75,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) =>
                               const Icon(Icons.image, size: 60),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
+
+                      // Product Details
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,22 +104,78 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             Text(
                               product.productName ?? "No Name",
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Rs $price${unitType.isNotEmpty ? ' / $unitType' : ''}",
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13,
                               ),
                             ),
                             const SizedBox(height: 6),
-                            Text(
-                              "Rs $price / ${product.unitType ?? ''}",
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
+
+                            // Quantity controls using Wrap to prevent overflow
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 0,
+                              runSpacing: 4,
                               children: [
-                                IconButton(
-                                  onPressed: () async {
-                                    if (quantity > 1) {
-                                      quantity--;
+                                SizedBox(
+                                  width: 32,
+                                  height: 32,
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () async {
+                                      if (quantity > 1) {
+                                        quantity--;
+                                        await ref
+                                            .read(
+                                              getCartViewModelProvider.notifier,
+                                            )
+                                            .updateCart(
+                                              item.id ?? '',
+                                              quantity.toDouble(),
+                                            );
+                                      }
+                                    },
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                      color: Colors.grey,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    quantity % 1 == 0
+                                        ? quantity.toInt().toString()
+                                        : quantity.toString(),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 32,
+                                  height: 32,
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () async {
+                                      quantity++;
                                       await ref
                                           .read(
                                             getCartViewModelProvider.notifier,
@@ -123,83 +184,85 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                             item.id ?? '',
                                             quantity.toDouble(),
                                           );
-                                    }
-                                  },
-                                  icon: const Icon(
-                                    Icons.remove_circle_outline,
-                                    color: Colors.grey,
+                                    },
+                                    icon: const Icon(
+                                      Icons.add_circle_outline,
+                                      color: Colors.grey,
+                                      size: 22,
+                                    ),
                                   ),
                                 ),
-                                Text(
-                                  "$quantity",
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                IconButton(
-                                  onPressed: () async {
-                                    quantity++;
-                                    await ref
-                                        .read(getCartViewModelProvider.notifier)
-                                        .updateCart(
-                                          item.id ?? '',
-                                          quantity.toDouble(),
-                                        );
-                                  },
-                                  icon: const Icon(
-                                    Icons.add_circle_outline,
-                                    color: Colors.grey,
+                                if (unitType.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 4),
+                                    child: Text(
+                                      unitType,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  product.unitType ?? '',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
                               ],
                             ),
                           ],
                         ),
                       ),
+
+                      // Total + Delete
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             "Rs $total",
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          IconButton(
-                            icon: cartState.isDeleting
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
+                          const SizedBox(height: 4),
+                          SizedBox(
+                            width: 36,
+                            height: 36,
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              icon: cartState.isDeleting
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.red,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.delete_outline,
                                       color: Colors.red,
+                                      size: 22,
                                     ),
-                                  )
-                                : const Icon(Icons.delete, color: Colors.red),
-                            onPressed: cartState.isDeleting
-                                ? null
-                                : () async {
-                                    final success = await ref
-                                        .read(getCartViewModelProvider.notifier)
-                                        .removeFromCart(item.id ?? '');
-                                    if (!mounted) return;
-                                    if (!success) {
-                                      SnackbarUtils.showError(
-                                        context,
-                                        "Failed to remove item",
-                                      );
-                                    } else {
-                                      SnackbarUtils.showSuccess(
-                                        context,
-                                        "Item removed successfully",
-                                      );
-                                    }
-                                  },
+                              onPressed: cartState.isDeleting
+                                  ? null
+                                  : () async {
+                                      final success = await ref
+                                          .read(
+                                            getCartViewModelProvider.notifier,
+                                          )
+                                          .removeFromCart(item.id ?? '');
+                                      if (!mounted) return;
+                                      if (!success) {
+                                        SnackbarUtils.showError(
+                                          context,
+                                          "Failed to remove item",
+                                        );
+                                      } else {
+                                        SnackbarUtils.showSuccess(
+                                          context,
+                                          "Item removed successfully",
+                                        );
+                                      }
+                                    },
+                            ),
                           ),
                         ],
                       ),
@@ -210,6 +273,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             },
           ),
         ),
+
+        // Bottom checkout bar
         Container(
           padding: const EdgeInsets.all(16),
           decoration: const BoxDecoration(

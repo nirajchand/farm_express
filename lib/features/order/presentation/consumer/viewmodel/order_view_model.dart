@@ -33,10 +33,7 @@ class OrderViewModel extends Notifier<OrderState> {
         },
         (placedOrder) {
           // Success
-          state = state.copyWith(
-            status: OrderStatus.success,
-            placedOrder: placedOrder,
-          );
+          state = state.copyWith(status: OrderStatus.success);
         },
       );
     } catch (e) {

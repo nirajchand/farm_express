@@ -24,7 +24,7 @@ class OrderRemoteDataSourceImpl implements IRemoteOrderDataSource {
       _tokenService = tokenService;
 
   @override
-  Future<OrderModel> placeOrder(OrderModel order) async {
+  Future<bool> placeOrder(OrderModel order) async {
     try {
       final token = await _tokenService.getToken();
 
@@ -35,7 +35,7 @@ class OrderRemoteDataSourceImpl implements IRemoteOrderDataSource {
       );
 
       if (response.data["success"] == true) {
-        return OrderModel.fromJson(response.data["data"]);
+        return true;
       } else {
         throw Exception(response.data["message"] ?? "Failed to place order");
       }

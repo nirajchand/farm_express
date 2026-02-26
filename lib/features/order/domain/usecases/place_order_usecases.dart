@@ -26,7 +26,7 @@ final placeOrderUsecasesProvider = Provider<PlaceOrderUsecases>((ref) {
 });
 
 
-class PlaceOrderUsecases implements UsecaseWithParams<OrderEntity, PlaceOrderUsecasesParams> {
+class PlaceOrderUsecases implements UsecaseWithParams<bool, PlaceOrderUsecasesParams> {
   final IOrderRepository _iOrderRepository;
 
   const PlaceOrderUsecases({
@@ -34,7 +34,7 @@ class PlaceOrderUsecases implements UsecaseWithParams<OrderEntity, PlaceOrderUse
   }) : _iOrderRepository = iOrderRepository;
 
   @override
-  Future<Either<Failure, OrderEntity>> call(PlaceOrderUsecasesParams params) {
+  Future<Either<Failure, bool>> call(PlaceOrderUsecasesParams params) {
     final orderEntity = OrderEntity(
       shippingAddress: params.shippingAddress,
       paymentMethod: params.paymentMethod,
