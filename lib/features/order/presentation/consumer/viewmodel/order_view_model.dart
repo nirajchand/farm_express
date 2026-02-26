@@ -1,4 +1,3 @@
-import 'package:farm_express/features/order/domain/entities/order_entity.dart';
 import 'package:farm_express/features/order/domain/usecases/get_order_usecases.dart';
 import 'package:farm_express/features/order/domain/usecases/place_order_usecases.dart';
 import 'package:farm_express/features/order/presentation/consumer/state/order_state.dart';
