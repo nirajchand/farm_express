@@ -1,4 +1,5 @@
 import 'package:farm_express/core/api/api_endpoints.dart';
+import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/cart/presentation/view_model/get_cart_view_model.dart';
 import 'package:farm_express/features/product/domain/entities/product_entities.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,8 @@ class ProductDetailsPage extends ConsumerStatefulWidget {
   const ProductDetailsPage({super.key, required this.product});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ProductDetailsPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _ProductDetailsPageState();
 }
 
 class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
@@ -116,7 +118,8 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                         fit: StackFit.expand,
                         children: [
                           Image.network(
-                            ApiEndpoints.serverUrl + (product.productImage ?? ''),
+                            ApiEndpoints.serverUrl +
+                                (product.productImage ?? ''),
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
@@ -437,14 +440,14 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                           try {
                             // Call your add to cart function here
 
-                            ref.read(getCartViewModelProvider.notifier).addToCart(product.id ?? '', quantity);
+                            ref
+                                .read(getCartViewModelProvider.notifier)
+                                .addToCart(product.id ?? '', quantity);
 
                             // Show confirmation
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Added to cart successfully!"),
-                                duration: Duration(seconds: 2),
-                              ),
+                            SnackbarUtils.showSuccess(
+                              context,
+                              "Added to cart successfully!",
                             );
                           } catch (e) {
                             // Show error if fails

@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
@@ -10,13 +9,9 @@ import 'package:farm_express/features/product/domain/entities/product_entities.d
 import 'package:farm_express/features/product/domain/repositories/product_respositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final productRepositoryProvider = Provider<ProductRepositories>((
-  ref,
-) {
+final productRepositoryProvider = Provider<ProductRepositories>((ref) {
   return ProductRepositories(
-    iProductRemoteDataSource: ref.read(
-      productRemoteDataSourceProvider,
-    ),
+    iProductRemoteDataSource: ref.read(productRemoteDataSourceProvider),
   );
 });
 
@@ -27,13 +22,17 @@ class ProductRepositories implements IProductRepository {
     required IProductRemoteDataSource iProductRemoteDataSource,
   }) : _iProductRemoteDataSource = iProductRemoteDataSource;
 
-
-
   @override
-  Future<Either<Failure, ProductEntities>> addProduct(ProductEntities data, File? image) async {
+  Future<Either<Failure, ProductEntities>> addProduct(
+    ProductEntities data,
+    File? image,
+  ) async {
     try {
       final newData = ProductApiModel.fromEntity(data);
-      final response = await _iProductRemoteDataSource.addProduct(newData, image);
+      final response = await _iProductRemoteDataSource.addProduct(
+        newData,
+        image,
+      );
       return Right(response.toEntity());
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
@@ -41,20 +40,46 @@ class ProductRepositories implements IProductRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteProduct(String productId) {
-    // TODO: implement deleteProduct
-    throw UnimplementedError();
+  Future<Either<Failure, bool>> deleteProduct(String productId) async {
+    try {
+      final response = await _iProductRemoteDataSource.deleteProduct(productId);
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
   }
 
   @override
-  Future<Either<Failure, List<ProductEntities>>> getAllProducts() async {
-       try {
-        final response = await _iProductRemoteDataSource.getAllProducts();
-        return Right(response.map((e) => e.toEntity()).toList());
-      } catch (e) {
-        return Left(ServerFailure(message: e.toString()));
-      }
+  Future<Either<Failure, ProductWithPaginationEntity>> getAllProducts({
+    required int page,
+    required int size,
+    String? search,
+  }) async {
+    try {
+      // Call remote datasource
+      final response = await _iProductRemoteDataSource.getAllProducts(
+        page: page,
+        size: size,
+        search: search,
+      );
+
+      // response should include both products and pagination
+      final products = response.products!.map((e) => e.toEntity()).toList();
+      final pagination = Pagination(
+        page: response.pagination!.page,
+        size: response.pagination!.size,
+        total: response.pagination!.total,
+        totalPages: response.pagination!.totalPages,
+      );
+
+      return Right(
+        ProductWithPaginationEntity(products: products, pagination: pagination),
+      );
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
   }
+
 
   @override
   Future<Either<Failure, List<ProductEntities>>> getProductsByFarmerId() async {
@@ -64,13 +89,20 @@ class ProductRepositories implements IProductRepository {
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }
-
   }
 
   @override
-  Future<Either<Failure, ProductEntities>> updateProduct(ProductEntities data) {
-    // TODO: implement updateProduct
-    throw UnimplementedError();
+  Future<Either<Failure, bool>> updateProduct(ProductEntities data, String productId, File? image) async {
+    try {
+      final newData = ProductApiModel.fromEntity(data);
+      final response = await _iProductRemoteDataSource.updateProduct(
+        newData,
+        productId,
+        image,
+      );
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
   }
-
 }

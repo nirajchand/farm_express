@@ -1,3 +1,4 @@
+import 'package:farm_express/core/api/api_endpoints.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
@@ -41,7 +42,7 @@ class ProductCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             child: imageUrl.isNotEmpty
                 ? Image.network(
-                    "http://10.0.2.2:2000$imageUrl",
+                    "${ApiEndpoints.serverUrl}$imageUrl",
                     height: 75,
                     width: 75,
                     fit: BoxFit.cover,

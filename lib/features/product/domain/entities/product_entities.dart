@@ -27,6 +27,7 @@ class ProductEntities extends Equatable {
 
   @override
   List<Object?> get props => [
+    id,
     farmerId,
     productName,
     price,
@@ -37,4 +38,33 @@ class ProductEntities extends Equatable {
     productImage,
     farmer,
   ];
+}
+
+
+
+class Pagination extends Equatable {
+  final int page;
+  final int size;
+  final int total;
+  final int totalPages;
+
+  const Pagination({
+    required this.page,
+    required this.size,
+    required this.total,
+    required this.totalPages,
+  });
+  
+  @override
+  List<Object?> get props =>[page,size,total,totalPages];
+}
+
+class ProductWithPaginationEntity {
+  final List<ProductEntities> products;
+  final Pagination pagination;
+
+  ProductWithPaginationEntity({
+    required this.products,
+    required this.pagination,
+  });
 }

@@ -13,12 +13,20 @@ class GetAllProductsViewModel extends Notifier<GetAllProductState> {
   @override
   GetAllProductState build() {
     _getAllproductsUsecases = ref.read(getAllProductsUsecasesProvider);
-    return GetAllProductState();
+    return const GetAllProductState();
   }
 
-  Future<void> getAllProducts() async {
+  Future<void> getAllProducts({
+    int page = 1,
+    int size = 10,
+    String? search,
+    bool append = false, 
+  }) async {
     state = state.copyWith(status: GetAllProductStateStatus.loading);
-    final result = await _getAllproductsUsecases.call();
+
+    final result = await _getAllproductsUsecases.call(
+      GetAllUseCasesParams(page: page, size: size, search: search),
+    );
 
     result.fold(
       (failure) {
@@ -27,12 +35,18 @@ class GetAllProductsViewModel extends Notifier<GetAllProductState> {
           errorMessage: failure.message,
         );
       },
-      (productsData) {
+      (data) {
         state = state.copyWith(
           status: GetAllProductStateStatus.success,
-          products: productsData,
+          products: append
+              ? [...?state.products, ...data.products] 
+              : data.products,
+          pagination: data.pagination, 
         );
       },
     );
   }
 }
+
+
+

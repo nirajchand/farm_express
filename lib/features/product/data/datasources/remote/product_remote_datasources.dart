@@ -29,22 +29,42 @@ class ProductRemoteDataSource implements IProductRemoteDataSource {
        _tokenService = tokenService;
 
   @override
-  Future<void> deleteProduct(String productId) {
-    throw UnimplementedError();
+  Future<bool> deleteProduct(String productId) async {
+    final token = await _tokenService.getToken();
+
+    final response = await _apiClient.delete(
+      ApiEndpoints.deleteProduct(productId),
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    if (response.data["success"] == true) {
+      return true;
+    }
+    return false;
   }
 
   @override
-  Future<List<ProductFetchModel>> getAllProducts() async {
+  Future<ProductWithPagination> getAllProducts({
+    required int page,
+    required int size,
+    String? search,
+  }) async {
     final token = await _tokenService.getToken();
 
     final responseJson = await _apiClient.get(
-      ApiEndpoints.getAllProducts,
+      ApiEndpoints.getAllProducts(page: page, size: size, search: search),
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
+
     final data = responseJson.data['data'] as List;
+    final paginationJson = responseJson.data["pagination"];
+    final pagination = Pagination.fromJson(paginationJson);
 
-    return data.map((json) => ProductFetchModel.fromJson(json)).toList();
+    final products = data
+        .map((json) => ProductFetchModel.fromJson(json))
+        .toList();
 
+    return ProductWithPagination(products: products, pagination: pagination);
   }
 
   @override
@@ -61,8 +81,36 @@ class ProductRemoteDataSource implements IProductRemoteDataSource {
   }
 
   @override
-  Future<ProductApiModel> updateProduct(ProductApiModel data) {
-    throw UnimplementedError();
+  Future<bool> updateProduct(
+    ProductApiModel data,
+    String productId,
+    File? image,
+  ) async {
+    final fileName = image?.path.split("/").last;
+
+    final token = await _tokenService.getToken();
+    final formData = FormData.fromMap({
+      "farmerId": data.farmerId,
+      "productName": data.productName,
+      "unitType": data.unitType,
+      "status": data.status,
+      "description": data.description,
+      "price": data.price,
+      "quantity": data.quantity,
+      if (image != null)
+        "product_image": await MultipartFile.fromFile(
+          image.path,
+          filename: fileName,
+        ),
+    });
+
+    final response = await _apiClient.put(
+      ApiEndpoints.updateProduct(productId),
+      data: formData,
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    return response.data["success"];
   }
 
   @override

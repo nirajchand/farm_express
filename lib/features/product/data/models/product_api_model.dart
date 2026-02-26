@@ -5,6 +5,8 @@ part 'product_api_model.g.dart';
 
 @JsonSerializable()
 class ProductApiModel {
+  @JsonKey(name: "_id")
+  final String? id;
   final String? farmerId;
   final String? productName;
   final double? price;
@@ -16,6 +18,7 @@ class ProductApiModel {
   final String? productImage;
 
   const ProductApiModel({
+    this.id,
     this.farmerId,
     this.productName,
     this.price,
@@ -47,6 +50,7 @@ class ProductApiModel {
 
   ProductEntities toEntity() {
     return ProductEntities(
+      id: id,
       farmerId: farmerId,
       productName: productName,
       price: price,

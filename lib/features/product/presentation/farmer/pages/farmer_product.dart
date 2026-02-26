@@ -1,3 +1,7 @@
+// farmers_page.dart
+
+import 'package:farm_express/features/product/presentation/farmer/pages/add_products.dart';
+import 'package:farm_express/features/product/presentation/farmer/pages/update_product.dart';
 import 'package:farm_express/features/product/presentation/farmer/view_model/farmer_product_view_model.dart';
 import 'package:farm_express/features/product/presentation/farmer/widgets/product_card.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +19,6 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
   @override
   void initState() {
     super.initState();
-
     Future.microtask(() {
       ref.read(farmerProductViewModelProvider.notifier).getProductsByFarmerId();
     });
@@ -33,54 +36,43 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Header
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const Text(
+                "Farmers",
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text(
-                    "Farmers",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        height: 42,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Navigate to Add Product Page
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 18),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 1,
-                          ),
-                          icon: const Icon(Icons.add, size: 18),
-                          label: const Text(
-                            "Add Product",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
+                  SizedBox(
+                    height: 42,
+                    child: ElevatedButton.icon(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => AddProductScreen()),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ],
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text(
+                        "Add Product",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 20),
-
-              /// Body
               Expanded(child: _buildBody(state)),
             ],
           ),
@@ -114,12 +106,99 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
           itemBuilder: (context, index) {
             final product = products[index];
 
-            return ProductCard(
-              imageUrl: product.productImage ?? "",
-              title: product.productName ?? "",
-              quantity: "${product.quantity} kg available",
-              price: "Rs. ${product.price}/kg",
-              status: product.status ?? "Unknown",
+            return Dismissible(
+              // Unique key per product
+              key: ValueKey(product.id),
+
+              // Only allow left-to-right swipe
+              direction: DismissDirection.endToStart,
+
+              // Red delete background shown while swiping
+              background: Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade400,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: const Row(
+                  children: [
+                    Icon(Icons.delete, color: Colors.white, size: 28),
+                    SizedBox(width: 8),
+                    Text(
+                      "Delete",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Confirm before deleting
+              confirmDismiss: (_) async {
+                return await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text("Delete Product"),
+                    content: Text(
+                      'Are you sure you want to delete "${product.productName}"?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                        child: const Text("Delete"),
+                      ),
+                    ],
+                  ),
+                );
+              },
+
+              onDismissed: (_) async {
+                final success = await ref
+                    .read(farmerProductViewModelProvider.notifier)
+                    .deleteProduct(product.id!);
+
+                if (!success && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Failed to delete product"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  // Refresh to restore item in list
+                  ref
+                      .read(farmerProductViewModelProvider.notifier)
+                      .getProductsByFarmerId();
+                }
+              },
+
+              child: GestureDetector(
+                // Tap card → go to update screen
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => UpdateProductScreen(product: product),
+                  ),
+                ),
+                child: ProductCard(
+                  imageUrl: product.productImage ?? "",
+                  title: product.productName ?? "",
+                  quantity: "${product.quantity} kg available",
+                  price: "Rs. ${product.price}/kg",
+                  status: product.status ?? "Unknown",
+                ),
+              ),
             );
           },
         );

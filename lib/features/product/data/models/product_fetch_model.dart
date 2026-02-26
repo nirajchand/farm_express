@@ -52,3 +52,33 @@ class ProductFetchModel {
     );
   }
 }
+
+class Pagination {
+  final int page;
+  final int size;
+  final int total;
+  final int totalPages;
+
+  Pagination({
+    required this.page,
+    required this.size,
+    required this.total,
+    required this.totalPages,
+  });
+
+  factory Pagination.fromJson(Map<String, dynamic> json) {
+    return Pagination(
+      page: json['page'],
+      size: json['size'],
+      total: json['total'],
+      totalPages: json['totalPages'],
+    );
+  }
+}
+
+class ProductWithPagination {
+  final List<ProductFetchModel>? products;
+  final Pagination? pagination;
+
+  ProductWithPagination({this.products, this.pagination});
+}

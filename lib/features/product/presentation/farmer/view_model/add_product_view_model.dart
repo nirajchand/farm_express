@@ -10,12 +10,10 @@ final addProductViewModelProvider =
 
 class AddProductViewModel extends Notifier<ProductState> {
   late final AddProductUsecases _addProductUsecases;
-  late final GetAllproductsUsecases _getAllproductsUsecases;
 
   @override
   ProductState build() {
     _addProductUsecases = ref.read(addProductUsecasesProvider);
-    _getAllproductsUsecases = ref.read(getAllProductsUsecasesProvider);
     return ProductState();
   }
 
@@ -39,23 +37,5 @@ class AddProductViewModel extends Notifier<ProductState> {
     );
   }
 
-  Future<void> getAllProducts() async {
-    state = state.copyWith(status: ProductStateStatus.loading);
-    final result = await _getAllproductsUsecases.call();
 
-    result.fold(
-      (failure) {
-        state = state.copyWith(
-          status: ProductStateStatus.failure,
-          errorMessage: failure.message,
-        );
-      },
-      (productsData) {
-        state = state.copyWith(
-          status: ProductStateStatus.success,
-          product: productsData,
-        );
-      },
-    );
-  }
 }
