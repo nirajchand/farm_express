@@ -1,12 +1,16 @@
 import 'dart:io';
 
+import 'package:farm_express/core/api/api_endpoints.dart';
 import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
-import 'package:farm_express/features/auth/presentation/pages/login_screen.dart';
 import 'package:farm_express/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:farm_express/features/consumer_profile/domain/usecases/update_consumer_profile_usecase.dart';
 import 'package:farm_express/features/consumer_profile/presentation/state/consumer_profile_state.dart';
 import 'package:farm_express/features/consumer_profile/presentation/view_model/consumer_profile_viewmodel.dart';
+import 'package:farm_express/features/order/domain/entities/order_entity.dart';
+import 'package:farm_express/features/order/presentation/consumer/state/order_state.dart';
+import 'package:farm_express/features/order/presentation/consumer/viewmodel/order_view_model.dart';
+import 'package:farm_express/screens/choose_role_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,10 +29,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(consumerProfileViewmodelProvider.notifier).getConsumerUser();
+      ref.read(orderViewModelProvider.notifier).fetchOrders();
     });
   }
 
   final List<XFile> _selectedMedia = [];
+  String _orderFilter = "All";
+
   final ImagePicker _imagePicker = ImagePicker();
 
   Future<bool> _getPermissionFromUser(Permission permission) async {
@@ -108,6 +115,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             _selectedMedia.clear();
             _selectedMedia.add(image);
           });
+          await ref
+              .read(consumerProfileViewmodelProvider.notifier)
+              .updateProfile(
+                UpdateConsumerProfileUsecaseParams(
+                  profileImage: File(image.path),
+                ),
+              );
         }
       }
     } catch (e) {
@@ -209,9 +223,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  List<OrderEntity> _filterOrders(List<OrderEntity> orders) {
+    final now = DateTime.now();
+
+    switch (_orderFilter) {
+      case "Daily":
+        return orders.where((order) {
+          final created = order.createdAt;
+          return created != null &&
+              created.year == now.year &&
+              created.month == now.month &&
+              created.day == now.day;
+        }).toList();
+
+      case "Monthly":
+        return orders.where((order) {
+          final created = order.createdAt;
+          return created != null &&
+              created.year == now.year &&
+              created.month == now.month;
+        }).toList();
+
+      case "All":
+      default:
+        return orders;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileState = ref.watch(consumerProfileViewmodelProvider);
+    final orderState = ref.watch(orderViewModelProvider);
 
     if (profileState.status == ConsumerProfileStatus.loading) {
       return Center(child: CircularProgressIndicator());
@@ -257,7 +299,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               : (profile?.profileImage != null &&
                                     profile!.profileImage!.isNotEmpty)
                               ? NetworkImage(
-                                  "http://10.0.2.2:2000${profile.profileImage}",
+                                  ApiEndpoints.serverUrl +
+                                      profile.profileImage!,
                                 )
                               : AssetImage("assets/images/healthy.jpg")
                                     as ImageProvider,
@@ -301,7 +344,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           if (mounted) {
                             navigator.pushAndRemoveUntil(
                               MaterialPageRoute(
-                                builder: (context) => LoginScreen(),
+                                builder: (context) => ChooseRoleScreen(),
                               ),
                               (route) => false,
                             );
@@ -485,11 +528,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(15),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Text(
+            const SizedBox(height: 15),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
                   "My Orders",
                   style: TextStyle(
                     color: Colors.black,
@@ -497,52 +541,177 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     fontSize: 18,
                   ),
                 ),
-              ),
-            ),
-
-            SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                height: 300,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withAlpha(128),
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      offset: Offset(0, 4),
-                    ),
+                DropdownButton<String>(
+                  value: _orderFilter,
+                  items: const [
+                    DropdownMenuItem(value: "All", child: Text("All")),
+                    DropdownMenuItem(value: "Daily", child: Text("Daily")),
+                    DropdownMenuItem(value: "Monthly", child: Text("Monthly")),
                   ],
-                ),
-                child: ListView.builder(
-                  itemCount: 8,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: Icon(Icons.image),
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [Text("Product: Potato"), Text("2026-1-23")],
-                      ),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Delivered",
-                            style: TextStyle(color: kPrimaryColor),
-                          ),
-                          Text("Price: 120"),
-                        ],
-                      ),
-                    );
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _orderFilter = value;
+                      });
+                    }
                   },
                 ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              height: 300,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withAlpha(128),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
+              child: switch (orderState.status) {
+                OrderStatus.loading => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                OrderStatus.failure => Center(
+                  child: Text(
+                    orderState.errorMessage ?? "Failed to load orders",
+                  ),
+                ),
+                OrderStatus.success when orderState.orders.isEmpty =>
+                  const Center(child: Text("No orders yet")),
+                _ => ListView.separated(
+                  itemCount: _filterOrders(orderState.orders).length,
+                  separatorBuilder: (_, __) => const Divider(),
+                  itemBuilder: (context, index) {
+                    final order = _filterOrders(orderState.orders)[index];
+                    return _ProfileOrderTile(order: order);
+                  },
+                ),
+              },
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ProfileOrderTile extends StatelessWidget {
+  final OrderEntity order;
+
+  const _ProfileOrderTile({required this.order});
+
+  Color _statusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return Colors.orange;
+      case 'accepted':
+        return Colors.blue;
+      case 'shipped':
+        return Colors.purple;
+      case 'delivered':
+        return Colors.green;
+      case 'cancelled':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return "-";
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final status = order.orderStatus ?? "Pending";
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Left: Order ID and Status
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  order.id != null && order.id!.length >= 6
+                      ? 'Order #${order.id!.substring(order.id!.length - 6).toUpperCase()}'
+                      : 'Order',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _statusColor(status).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    status,
+                    style: TextStyle(
+                      color: _statusColor(status),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Right: Price and Date
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Rs ${order.totalAmount ?? 0}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Colors.green,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _formatDate(order.createdAt),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

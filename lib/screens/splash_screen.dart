@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/core/services/storage/user_session_service.dart';
-import 'package:farm_express/features/consumer/dashboard/presentation/pages/botton_navigation_screen.dart';
+import 'package:farm_express/features/dashboard/presentation/pages/botton_navigation_screen.dart';
+import 'package:farm_express/features/farmer_dashboard/presentation/pages/navigation_farmer.dart';
 import 'package:farm_express/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,11 +22,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     Timer(const Duration(seconds: 3), () {
       final userSessionService = ref.read(userSessionServiceProvider);
       final isLoggedIn = userSessionService.isLoggedIn();
+      final role = userSessionService.getRole()?.trim().toLowerCase();
       if (isLoggedIn) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => BottonNavigationScreen()),
-        );
+        if(role == 'consumer') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => BottonNavigationScreen()),
+          );
+        } else if (role == 'farmer') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => FarmerBottonNavigationScreen()),
+          );
+        } else {
+          // If role is unknown, navigate to onboarding or login
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => OnboardingScreen()),
+          );
+        }
       } else {
         Navigator.pushReplacement(
           context,

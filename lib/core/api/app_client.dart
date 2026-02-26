@@ -92,6 +92,21 @@ class ApiClient {
     );
   }
 
+  // Post Form request
+  Future<Response> postForm(
+    String path, {
+    required FormData data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return _dio.post(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
+  }
+
   // put request
   Future<Response> put(
     String path, {

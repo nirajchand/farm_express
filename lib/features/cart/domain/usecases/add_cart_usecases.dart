@@ -6,6 +6,7 @@ import 'package:farm_express/core/error/failures.dart';
 import 'package:farm_express/core/usecases/app_usecases.dart';
 import 'package:farm_express/features/cart/data/repositories/cart_repositories.dart';
 import 'package:farm_express/features/cart/domain/entities/cart_entities.dart';
+import 'package:farm_express/features/cart/domain/entities/cretate_cart_entities.dart';
 import 'package:farm_express/features/cart/domain/respositories/cart_respositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,7 +38,7 @@ class AddCartUsecases implements UsecaseWithParams<bool, AddCartUsecasesParams> 
   
   @override
   Future<Either<Failure, bool>> call(AddCartUsecasesParams params) {
-    final cartCreateEntities = CartEntities(
+    final cartCreateEntities = AddCartEntity(
       productId: params.productId,
       quantity: params.quantity,
     );

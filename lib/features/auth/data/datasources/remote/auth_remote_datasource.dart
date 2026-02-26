@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:farm_express/core/api/api_endpoints.dart';
 import 'package:farm_express/core/api/app_client.dart';
 import 'package:farm_express/core/services/storage/token_service.dart';

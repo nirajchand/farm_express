@@ -1,10 +1,11 @@
 import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
+import 'package:farm_express/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
 import 'package:farm_express/features/auth/presentation/view_model/auth_view_model.dart';
-import 'package:farm_express/features/consumer/dashboard/presentation/pages/botton_navigation_screen.dart';
+import 'package:farm_express/features/dashboard/presentation/pages/botton_navigation_screen.dart';
 import 'package:farm_express/features/auth/presentation/pages/signup_screen.dart';
-import 'package:farm_express/features/farmer/farmer_dashboard/presentation/pages/farmer_dashboard.dart';
+import 'package:farm_express/features/farmer_dashboard/presentation/pages/navigation_farmer.dart';
 import 'package:farm_express/widgets/elevated_button.dart';
 import 'package:farm_express/widgets/my_text_form_field.dart';
 import 'package:flutter/material.dart';
@@ -43,16 +44,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (next.status == AuthStatus.error) {
         SnackbarUtils.showError(context, next.errorMessage ?? "Login Failed!");
       } else if (next.status == AuthStatus.authenticated) {
-        final role = next.user!.userType;
+        final role = next.user!.userType.trim().toLowerCase();
         if (role == 'consumer') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => BottonNavigationScreen()),
+            MaterialPageRoute(builder: (_) => BottonNavigationScreen()),
           );
-        } else {
+        } else if (role == 'farmer') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => FarmerDashboard()),
+            MaterialPageRoute(builder: (_) => FarmerBottonNavigationScreen()),
           );
         }
       }
@@ -136,7 +137,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ForgotPasswordPage(),
+                              ),
+                            );
+                          },
                           child: Text(
                             "Forget Password?",
                             style: TextStyle(
@@ -155,44 +163,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         // foregroundColor: Colors.white,
                         text: "Sign In to Your Account",
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        "OR",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          elevation: 0,
-                          side: BorderSide(color: kPrimaryColor, width: 1.5),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        icon: SizedBox(
-                          height: 28,
-                          child: Image.asset("assets/icons/google.webp"),
-                        ),
-                        label: const Text(
-                          "Continue with Google",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-
                       SizedBox(height: 20),
                       TextButton(
                         onPressed: () {

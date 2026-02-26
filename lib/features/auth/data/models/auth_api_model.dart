@@ -1,5 +1,4 @@
 import 'package:farm_express/features/auth/domain/entities/auth_entity.dart';
-import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
 
 class AuthApiModel {
   final String? id;

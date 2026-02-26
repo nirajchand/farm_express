@@ -1,6 +1,4 @@
-// farmer_product_view_model.dart
 
-import 'package:farm_express/features/product/domain/entities/product_entities.dart';
 import 'package:farm_express/features/product/domain/usecases/delete_product_usecases.dart';
 import 'package:farm_express/features/product/domain/usecases/get_farmer_product_usecases.dart';
 import 'package:farm_express/features/product/domain/usecases/update_product_usecases.dart';

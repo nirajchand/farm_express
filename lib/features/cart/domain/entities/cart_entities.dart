@@ -1,18 +1,17 @@
-
-
 import 'package:equatable/equatable.dart';
-import 'package:farm_express/features/product/domain/entities/product_entities.dart';
+import 'package:farm_express/features/cart/domain/entities/cart_item_entities.dart';
 
 class CartEntities extends Equatable {
-  final String? productId;
-  final int? quantity;
-  final List<ProductEntities>? items;
-  
+  final String? id;
+  final String? consumerId;
+  final List<CartItemEntity>? items;
+
   const CartEntities({
-    this.productId,
-    this.quantity,
+    this.id,
+    this.consumerId,
     this.items,
   });
+
   @override
-  List<Object?> get props => [productId, quantity, items];
+  List<Object?> get props => [id, consumerId, items];
 }

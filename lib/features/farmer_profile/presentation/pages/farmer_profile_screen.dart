@@ -1,12 +1,13 @@
 import 'dart:io';
 
+import 'package:farm_express/core/api/api_endpoints.dart';
 import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
-import 'package:farm_express/features/auth/presentation/pages/login_screen.dart';
 import 'package:farm_express/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:farm_express/features/farmer_profile/domain/usecases/update_farmer_profile_usecases.dart';
 import 'package:farm_express/features/farmer_profile/presentation/state/farmer_profile_state.dart';
 import 'package:farm_express/features/farmer_profile/presentation/view_model/farmer_profile_viewmodel.dart';
+import 'package:farm_express/screens/choose_role_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -333,7 +334,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                               : (profile?.profileImage != null &&
                                         profile!.profileImage!.isNotEmpty)
                                   ? NetworkImage(
-                                      "http://10.0.2.2:2000${profile.profileImage}",
+                                      "${ApiEndpoints.serverUrl}${profile.profileImage}",
                                     )
                                   : const AssetImage(
                                       "assets/images/healthy.jpg",
@@ -382,7 +383,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                           if (mounted) {
                             navigator.pushAndRemoveUntil(
                               MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
+                                builder: (context) => const ChooseRoleScreen(),
                               ),
                               (route) => false,
                             );

@@ -72,6 +72,7 @@ dependencies:
   # utilities
   uuid: ^4.3.3
   json_annotation: ^4.8.1
+  flutter_launcher_icons: ^0.14.4
 
 
 
@@ -135,3 +136,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+
+flutter_launcher_icons:
+  android: "launcher_icons"
+  ios: "AppIcon"
+  image_path: "assets/images/project_logo.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
