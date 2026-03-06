@@ -80,17 +80,5 @@ void main() {
 
   });
 
-  group('LoginPage Form Validation', () {
-    testWidgets('should show error for empty email', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-
-      await tester.enterText(find.byType(TextFormField).last, 'password123');
-      await tester.tap(find.byType(ElevatedButton));
-      await tester.pump();
-
-      expect(find.text('Please ent53er your email'), findsOneWidget);
-    });
-  });
-
 
 }

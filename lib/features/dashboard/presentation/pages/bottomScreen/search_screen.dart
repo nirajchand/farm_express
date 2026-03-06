@@ -24,7 +24,6 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
   bool _isFetchingMore = false;
   bool _isSearchFocused = false;
 
-  static const _green = Color(0xFF2E7D32);
 
   @override
   void initState() {
