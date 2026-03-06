@@ -72,7 +72,6 @@ class AuthRepository implements IAuthRepository {
     }
   }
 
-
   @override
   Future<Either<Failure, bool>> registerUser(AuthEntity user) async {
     if (await _networkInfo.isConnected) {
@@ -105,7 +104,7 @@ class AuthRepository implements IAuthRepository {
       }
     }
   }
-  
+
   @override
   Future<Either<Failure, bool>> logout() async {
     try {
@@ -114,6 +113,35 @@ class AuthRepository implements IAuthRepository {
         return const Right(true);
       }
       return const Left(LocalDatabaseFailure(message: "Failed to logout"));
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> resetPassword(
+    String token,
+    String newPassword,
+  ) async {
+    try {
+      final result = await _authRemoteDatasource.resetToken(token, newPassword);
+      if (result) {
+        return const Right(true);
+      }
+      return const Left(LocalDatabaseFailure(message: "Failed to reset"));
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> sendToken(String email) async {
+        try {
+      final result = await _authRemoteDatasource.sendToken(email);
+      if (result) {
+        return const Right(true);
+      }
+      return const Left(LocalDatabaseFailure(message: "Failed to send token"));
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }

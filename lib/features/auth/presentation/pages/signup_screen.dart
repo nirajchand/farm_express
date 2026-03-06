@@ -1,8 +1,10 @@
-import 'package:farm_express/core/constants/colors.dart';
+// signup_screen.dart
+
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/auth/presentation/pages/login_screen.dart';
 import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
 import 'package:farm_express/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:farm_express/widgets/elevated_button.dart';
 import 'package:farm_express/widgets/my_text_form_field.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +49,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark
+        ? AppColors.getDark() as dynamic
+        : AppColors.getLight() as dynamic;
 
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next.status == AuthStatus.error) {
@@ -61,21 +67,21 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(backgroundColor: Colors.white),
+      backgroundColor: colors.background,
+      appBar: AppBar(backgroundColor: colors.background, elevation: 0),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Center(child: Image.asset("assets/images/project_logo.png")),
             Container(
               width: double.infinity,
-              margin: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+              margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(32),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF000000).withValues(alpha: 0.12),
+                    color: colors.shadow.withValues(alpha: 0.12),
                     offset: const Offset(0, 10),
                     blurRadius: 30,
                     spreadRadius: -5,
@@ -93,7 +99,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
-                          color: kGreenColor,
+                          color: colors.primary,
                         ),
                       ),
                       Text(
@@ -101,16 +107,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: kGreenColor,
+                          color: colors.primary,
                         ),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       MyTextFormField(
                         controller: _fullNameController,
                         labelText: "Full Name",
                         prefixIcon: Icon(
                           Icons.person_3_rounded,
-                          color: kPrimaryColor,
+                          color: colors.primary,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -119,15 +125,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       MyTextFormField(
                         controller: _emailController,
                         labelText: "Email address",
                         hint: Text(
                           "e.g abc123@gmail.com",
-                          style: TextStyle(color: Colors.blueGrey),
+                          style: TextStyle(color: colors.textSecondary),
                         ),
-                        prefixIcon: Icon(Icons.email, color: kPrimaryColor),
+                        prefixIcon: Icon(Icons.email, color: colors.primary),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your email';
@@ -135,14 +141,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       MyTextFormField(
                         controller: _passwordController,
                         labelText: "Password",
-                        prefixIcon: Icon(Icons.lock, color: kPrimaryColor),
+                        prefixIcon: Icon(Icons.lock, color: colors.primary),
                         suffixiocn: Icon(
                           Icons.visibility_off,
-                          color: kPrimaryColor,
+                          color: colors.primary,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -151,14 +157,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       MyTextFormField(
                         controller: _confirmPasswordController,
                         labelText: "Confirm Password",
-                        prefixIcon: Icon(Icons.lock, color: kPrimaryColor),
+                        prefixIcon: Icon(Icons.lock, color: colors.primary),
                         suffixiocn: Icon(
                           Icons.visibility_off,
-                          color: kPrimaryColor,
+                          color: colors.primary,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -170,33 +176,30 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 15),
-
+                      const SizedBox(height: 15),
                       SizedBox(
                         width: double.infinity,
                         child: MyElevatedButton(
                           onPressed: _register,
-                          backgroundColor: kPrimaryColor,
-                          foregroundColor: Colors.white,
+                          backgroundColor: colors.primary,
+                          foregroundColor: colors.white,
                           text: "Create Your Account",
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       TextButton(
                         onPressed: () {
-                          setState(() {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginScreen(),
-                              ),
-                            );
-                          });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
+                          );
                         },
                         child: Text(
                           "Already have an account? SignIn",
                           style: TextStyle(
-                            color: kPrimaryColor,
+                            color: colors.primary,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),

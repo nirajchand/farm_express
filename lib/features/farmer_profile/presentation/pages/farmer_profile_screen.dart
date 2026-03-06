@@ -8,6 +8,8 @@ import 'package:farm_express/features/farmer_profile/domain/usecases/update_farm
 import 'package:farm_express/features/farmer_profile/presentation/state/farmer_profile_state.dart';
 import 'package:farm_express/features/farmer_profile/presentation/view_model/farmer_profile_viewmodel.dart';
 import 'package:farm_express/screens/choose_role_screen.dart';
+import 'package:farm_express/theme/app_colors.dart';
+import 'package:farm_express/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -209,6 +211,8 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
   Widget _editableRow({
     required String value,
     required VoidCallback onEdit,
+    required Color textColor,
+    required dynamic colors,
   }) {
     return GestureDetector(
       onTap: onEdit,
@@ -221,7 +225,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
               style: TextStyle(fontSize: 16, color: textColor),
             ),
           ),
-          Icon(Icons.edit, color: kPrimaryColor, size: 20),
+          Icon(Icons.edit, color: colors.primary, size: 20),
         ],
       ),
     );
@@ -229,12 +233,12 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
 
   // ─── Field label ─────────────────────────────────────────────────────────
 
-  Widget _fieldLabel(String label) {
+  Widget _fieldLabel(String label, {required dynamic colors}) {
     return Text(
       label,
       style: TextStyle(
         fontSize: 16,
-        color: kPrimaryColor,
+        color: colors.primary,
         fontWeight: FontWeight.bold,
       ),
     );
@@ -242,16 +246,16 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
 
   // ─── Info card ────────────────────────────────────────────────────────────
 
-  Widget _infoCard({required List<Widget> children}) {
+  Widget _infoCard({required List<Widget> children, required dynamic colors}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withAlpha(128),
+            color: colors.shadow,
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 4),
@@ -267,15 +271,15 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
 
   // ─── Section title ────────────────────────────────────────────────────────
 
-  Widget _sectionTitle(String title) {
+  Widget _sectionTitle(String title, {required dynamic colors}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 18, 4, 10),
       child: Align(
         alignment: Alignment.topLeft,
         child: Text(
           title,
-          style: const TextStyle(
-            color: Colors.black,
+          style: TextStyle(
+            color: colors.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -283,11 +287,226 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
       ),
     );
   }
+  // ─── Theme Menu ───────────────────────────────────────────────────────────
 
+  void _showThemeMenu(
+    BuildContext context,
+    WidgetRef ref,
+    bool isDark,
+    dynamic colors,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.5,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Theme Settings",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Auto Theme Toggle with Circular Checkbox
+              Consumer(
+                builder: (context, ref, child) {
+                  final autoThemeEnabled = ref.watch(autoThemeProvider);
+                  return GestureDetector(
+                    onTap: () {
+                      if (autoThemeEnabled) {
+                        ref.read(autoThemeProvider.notifier).disableAutoTheme();
+                      } else {
+                        ref.read(autoThemeProvider.notifier).enableAutoTheme();
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: autoThemeEnabled
+                            ? colors.primary?.withAlpha(25) ??
+                                  Colors.blue.withAlpha(25)
+                            : colors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: autoThemeEnabled
+                              ? colors.primary ?? Colors.blue
+                              : colors.textSecondary?.withAlpha(50) ??
+                                    Colors.grey.withAlpha(50),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Circular Checkbox
+                          Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: colors.primary ?? Colors.blue,
+                                width: 2,
+                              ),
+                              color: autoThemeEnabled
+                                  ? colors.primary ?? Colors.blue
+                                  : Colors.transparent,
+                            ),
+                            child: autoThemeEnabled
+                                ? Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: Colors.white,
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Auto Theme",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.textPrimary,
+                                  ),
+                                ),
+                                Text(
+                                  "Follow environment light automatically",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: colors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+
+              // Manual Theme Selection
+              Text(
+                "Manual Theme Selection",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Light Mode Option
+              GestureDetector(
+                onTap: () {
+                  // Disable auto theme and set to light
+                  ref.read(autoThemeProvider.notifier).disableAutoTheme();
+                  ref.read(themeModeProvider.notifier).setLightTheme();
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        colors.primary?.withAlpha(15) ??
+                        Colors.blue.withAlpha(15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.light_mode,
+                        color: colors.primary ?? Colors.blue,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        "Light Mode",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: colors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Dark Mode Option
+              GestureDetector(
+                onTap: () {
+                  // Disable auto theme and set to dark
+                  ref.read(autoThemeProvider.notifier).disableAutoTheme();
+                  ref.read(themeModeProvider.notifier).setDarkTheme();
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        colors.primary?.withAlpha(15) ??
+                        Colors.blue.withAlpha(15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.dark_mode,
+                        color: colors.primary ?? Colors.blue,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        "Dark Mode",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: colors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
   // ─── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark ? AppColorsDark() : AppColorsLight() as dynamic;
     final profileState = ref.watch(farmerProfileViewmodelProvider);
 
     if (profileState.status == FarmerProfileStatus.loading) {
@@ -305,15 +524,92 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
         padding: const EdgeInsets.all(15),
         child: Column(
           children: [
-            // ── Avatar card ──────────────────────────────────────────────
+            // ─── Top Header with Profile Image and Menu ───────────────────
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Profile Image on Left
+                  GestureDetector(
+                    onTap: _pickMedia,
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 45,
+                          backgroundImage: _selectedMedia.isNotEmpty
+                              ? FileImage(File(_selectedMedia.first.path))
+                              : (profile?.profileImage != null &&
+                                    profile!.profileImage!.isNotEmpty)
+                              ? NetworkImage(
+                                  "${ApiEndpoints.serverUrl}${profile.profileImage}",
+                                )
+                              : const AssetImage("assets/images/healthy.jpg")
+                                    as ImageProvider,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            height: 26,
+                            width: 26,
+                            decoration: BoxDecoration(
+                              color: kPrimaryColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                            child: const Icon(
+                              Icons.camera,
+                              color: Colors.white,
+                              size: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        profile?.fullName ?? "Farmer Name",
+                        style: TextStyle(
+                          color: colors.textPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        profile?.email ?? "email@example.com",
+                        style: TextStyle(
+                          color: colors.textSecondary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Hamburger Menu on Right
+                  GestureDetector(
+                    onTap: () => _showThemeMenu(context, ref, isDark, colors),
+                    child: Icon(
+                      Icons.menu,
+                      color: colors.textPrimary,
+                      size: 28,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // ─── Profile Card ─────────────────────────────────────────────
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withAlpha(128),
+                    color: colors.shadow.withAlpha(128),
                     spreadRadius: 1,
                     blurRadius: 4,
                     offset: const Offset(0, 4),
@@ -322,93 +618,56 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: _pickMedia,
-                    child: Stack(
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundImage: _selectedMedia.isNotEmpty
-                              ? FileImage(File(_selectedMedia.first.path))
-                              : (profile?.profileImage != null &&
-                                        profile!.profileImage!.isNotEmpty)
-                                  ? NetworkImage(
-                                      "${ApiEndpoints.serverUrl}${profile.profileImage}",
-                                    )
-                                  : const AssetImage(
-                                      "assets/images/healthy.jpg",
-                                    ) as ImageProvider,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            height: 32,
-                            width: 32,
-                            decoration: BoxDecoration(
-                              color: kPrimaryColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+                        // Logout button
+                        GestureDetector(
+                          onTap: () async {
+                            final navigator = Navigator.of(context);
+                            await ref
+                                .read(authViewModelProvider.notifier)
+                                .logout();
+                            if (mounted) {
+                              navigator.pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ChooseRoleScreen(),
+                                ),
+                                (route) => false,
+                              );
+                            }
+                          },
+                          child: const Icon(
+                            Icons.exit_to_app,
+                            color: Colors.black,
+                            size: 26,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    profile?.fullName ?? "Farmer Name",
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () async {
-                          final navigator = Navigator.of(context);
-                          await ref
-                              .read(authViewModelProvider.notifier)
-                              .logout();
-                          if (mounted) {
-                            navigator.pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => const ChooseRoleScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          }
-                        },
-                        child: const Icon(
-                          Icons.exit_to_app,
-                          color: Colors.black,
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 6),
                 ],
               ),
             ),
 
             // ── Personal Information ─────────────────────────────────────
-            _sectionTitle("Personal Information"),
+            _sectionTitle("Personal Information", colors: colors),
             _infoCard(
+              colors: colors,
               children: [
-                _fieldLabel("Full Name"),
+                _fieldLabel("Full Name", colors: colors),
                 _editableRow(
                   value: profile?.fullName ?? "Enter Name",
+                  textColor: colors.textPrimary,
+                  colors: colors,
                   onEdit: () => _showEditDialog(
                     title: "Full Name",
                     initialValue: profile?.fullName ?? "",
@@ -424,9 +683,11 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _fieldLabel("Email"),
+                _fieldLabel("Email", colors: colors),
                 _editableRow(
                   value: profile?.email ?? "Enter email",
+                  textColor: colors.textPrimary,
+                  colors: colors,
                   onEdit: () => _showEditDialog(
                     title: "Email",
                     initialValue: profile?.email ?? "",
@@ -442,9 +703,11 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _fieldLabel("Phone"),
+                _fieldLabel("Phone", colors: colors),
                 _editableRow(
                   value: "+977 ${profile?.phoneNumber ?? "Enter number"}",
+                  textColor: colors.textPrimary,
+                  colors: colors,
                   onEdit: () => _showEditDialog(
                     title: "Phone Number",
                     initialValue: profile?.phoneNumber ?? "",
@@ -465,12 +728,15 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
             ),
 
             // ── Farm Information ─────────────────────────────────────────
-            _sectionTitle("Farm Information"),
+            _sectionTitle("Farm Information", colors: colors),
             _infoCard(
+              colors: colors,
               children: [
-                _fieldLabel("Farm Name"),
+                _fieldLabel("Farm Name", colors: colors),
                 _editableRow(
                   value: profile?.farmName ?? "Enter farm name",
+                  textColor: colors.textPrimary,
+                  colors: colors,
                   onEdit: () => _showEditDialog(
                     title: "Farm Name",
                     initialValue: profile?.farmName ?? "",
@@ -486,9 +752,11 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _fieldLabel("Description"),
+                _fieldLabel("Description", colors: colors),
                 _editableRow(
                   value: profile?.description ?? "Enter farm description",
+                  textColor: colors.textPrimary,
+                  colors: colors,
                   onEdit: () => _showEditDialog(
                     title: "Description",
                     initialValue: profile?.description ?? "",
@@ -507,9 +775,11 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _fieldLabel("Location"),
+                _fieldLabel("Location", colors: colors),
                 _editableRow(
                   value: profile?.farmLocation ?? "Enter location",
+                  textColor: colors.textPrimary,
+                  colors: colors,
                   onEdit: () => _showEditDialog(
                     title: "Location",
                     initialValue: profile?.farmLocation ?? "",
@@ -519,7 +789,9 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                       ref
                           .read(farmerProfileViewmodelProvider.notifier)
                           .updateProfile(
-                            UpdateFarmerProfileUsecaseParams(farmLocation: value),
+                            UpdateFarmerProfileUsecaseParams(
+                              farmLocation: value,
+                            ),
                           );
                     },
                   ),

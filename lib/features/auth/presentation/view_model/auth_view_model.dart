@@ -1,6 +1,8 @@
 import 'package:farm_express/features/auth/domain/usecases/login_usecases.dart';
 import 'package:farm_express/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:farm_express/features/auth/domain/usecases/register_usecases.dart';
+import 'package:farm_express/features/auth/domain/usecases/reset_password_usecases.dart';
+import 'package:farm_express/features/auth/domain/usecases/send_token_usecases.dart';
 import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,12 +14,16 @@ class AuthViewModel extends Notifier<AuthState> {
   late final RegisterUsecase _registerUsecase;
   late final LoginUsecase _loginUsecases;
   late final LogoutUsecase _logoutUsecase;
+  late final SendTokenUsecases _sendTokenUsecase;
+  late final ResetPasswordUsecases _resetPasswordUsecase;
 
   @override
   AuthState build() {
     _registerUsecase = ref.read(registerUsecaseProvider);
     _loginUsecases = ref.read(loginUsecasesProvider);
     _logoutUsecase = ref.read(logoutUsecaseProvider);
+    _sendTokenUsecase = ref.read(sendTokenProvider);
+    _resetPasswordUsecase = ref.read(resetPasswordsecasesProvider);
     return AuthState();
   }
 
@@ -99,6 +105,47 @@ class AuthViewModel extends Notifier<AuthState> {
         status: AuthStatus.unauthenticated,
         user: null,
       ),
+    );
+  }
+
+  Future<void> sendResetToken({required String email}) async {
+    state = state.copyWith(status: AuthStatus.loading);
+    final result = await _sendTokenUsecase.call(email);
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: failure.message,
+      ),
+      (success) => state = state.copyWith(
+        status: AuthStatus.tokenSent,
+        resetEmail: email, 
+      ),
+    );
+  }
+
+  // Reset password using token
+  Future<void> resetPassword({
+    required String token,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    if (newPassword != confirmPassword) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: "Passwords do not match",
+      );
+      return;
+    }
+
+    state = state.copyWith(status: AuthStatus.loading);
+    final params = ResetPasswordUsecasesParams(token: token, newPassword: newPassword);
+    final result = await _resetPasswordUsecase.call(params);
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: failure.message,
+      ),
+      (success) => state = state.copyWith(status: AuthStatus.passwordReset),
     );
   }
 }

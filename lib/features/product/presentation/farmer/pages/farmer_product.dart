@@ -4,6 +4,7 @@ import 'package:farm_express/features/product/presentation/farmer/pages/add_prod
 import 'package:farm_express/features/product/presentation/farmer/pages/update_product.dart';
 import 'package:farm_express/features/product/presentation/farmer/view_model/farmer_product_view_model.dart';
 import 'package:farm_express/features/product/presentation/farmer/widgets/product_card.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:farm_express/features/product/presentation/farmer/state/farmer_product.dart';
@@ -27,21 +28,25 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(farmerProductViewModelProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark
+        ? AppColors.getDark() as dynamic
+        : AppColors.getLight() as dynamic;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Farmers",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green,
+                  color: colors.primary,
                 ),
               ),
               const SizedBox(height: 10),
@@ -56,8 +61,8 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
                         MaterialPageRoute(builder: (_) => AddProductScreen()),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
+                        backgroundColor: colors.primary,
+                        foregroundColor: colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -73,7 +78,7 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
                 ],
               ),
               const SizedBox(height: 20),
-              Expanded(child: _buildBody(state)),
+              Expanded(child: _buildBody(state, colors)),
             ],
           ),
         ),
@@ -81,16 +86,16 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
     );
   }
 
-  Widget _buildBody(FarmerProductState state) {
+  Widget _buildBody(FarmerProductState state, dynamic colors) {
     switch (state.status) {
       case FarmerProductStatus.loading:
-        return const Center(child: CircularProgressIndicator());
+        return Center(child: CircularProgressIndicator(color: colors.primary));
 
       case FarmerProductStatus.failure:
         return Center(
           child: Text(
             state.errorMessage ?? "Something went wrong",
-            style: const TextStyle(color: Colors.red),
+            style: TextStyle(color: colors.error),
           ),
         );
 
@@ -98,7 +103,16 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
         final products = state.products;
 
         if (products.isEmpty) {
-          return const Center(child: Text("No products found"));
+          return Center(
+            child: Text(
+              "No products found",
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          );
         }
 
         return ListView.builder(
@@ -107,55 +121,63 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
             final product = products[index];
 
             return Dismissible(
-              // Unique key per product
               key: ValueKey(product.id),
-
-              // Only allow left-to-right swipe
               direction: DismissDirection.endToStart,
-
-              // Red delete background shown while swiping
               background: Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade400,
+                  color: colors.errorRed,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.centerRight,
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: const Row(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Icon(Icons.delete, color: Colors.white, size: 28),
-                    SizedBox(width: 8),
                     Text(
                       "Delete",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Icon(Icons.delete, color: colors.white, size: 28),
                   ],
                 ),
               ),
-
-              // Confirm before deleting
               confirmDismiss: (_) async {
                 return await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text("Delete Product"),
+                    backgroundColor: colors.surface,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    title: Text(
+                      "Delete Product",
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     content: Text(
                       'Are you sure you want to delete "${product.productName}"?',
+                      style: TextStyle(color: colors.textSecondary),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text("Cancel"),
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(color: colors.textSecondary),
+                        ),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, true),
                         style: TextButton.styleFrom(
-                          foregroundColor: Colors.red,
+                          foregroundColor: colors.error,
                         ),
                         child: const Text("Delete"),
                       ),
@@ -163,7 +185,6 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
                   ),
                 );
               },
-
               onDismissed: (_) async {
                 final success = await ref
                     .read(farmerProductViewModelProvider.notifier)
@@ -171,20 +192,17 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
 
                 if (!success && mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Failed to delete product"),
-                      backgroundColor: Colors.red,
+                    SnackBar(
+                      content: const Text("Failed to delete product"),
+                      backgroundColor: colors.error,
                     ),
                   );
-                  // Refresh to restore item in list
                   ref
                       .read(farmerProductViewModelProvider.notifier)
                       .getProductsByFarmerId();
                 }
               },
-
               child: GestureDetector(
-                // Tap card → go to update screen
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -203,7 +221,6 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
           },
         );
 
-      case FarmerProductStatus.initial:
       default:
         return const SizedBox();
     }

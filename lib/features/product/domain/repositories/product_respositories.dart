@@ -18,3 +18,8 @@ abstract class IProductRepository {
   Future<Either<Failure, bool>> deleteProduct(String productId);
   Future<Either<Failure, List<ProductEntities>>> getProductsByFarmerId();
 }
+
+
+abstract class ShakeRepository {
+  Stream<void> get onShake;
+}

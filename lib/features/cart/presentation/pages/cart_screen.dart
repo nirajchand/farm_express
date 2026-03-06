@@ -1,9 +1,9 @@
 import 'package:farm_express/core/api/api_endpoints.dart';
-import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/cart/presentation/state/cart_state.dart';
 import 'package:farm_express/features/cart/presentation/view_model/get_cart_view_model.dart';
 import 'package:farm_express/features/order/presentation/consumer/pages/place_order_screen.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,6 +28,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark ? AppColorsDark() : AppColorsLight() as dynamic;
     final cartState = ref.watch(getCartViewModelProvider);
 
     if (cartState.status == CartStatus.loading) {
@@ -73,6 +75,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
               return Card(
                 elevation: 3,
+                color: colors.surface,
                 margin: const EdgeInsets.only(bottom: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -103,9 +106,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           children: [
                             Text(
                               product.productName ?? "No Name",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
+                                color: colors.textPrimary,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -113,8 +117,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             const SizedBox(height: 4),
                             Text(
                               "Rs $price${unitType.isNotEmpty ? ' / $unitType' : ''}",
-                              style: const TextStyle(
-                                color: Colors.grey,
+                              style: TextStyle(
+                                color: colors.textSecondary,
                                 fontSize: 13,
                               ),
                             ),
@@ -157,16 +161,17 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
-                                    ),
+                                    border: Border.all(color: colors.border),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     quantity % 1 == 0
                                         ? quantity.toInt().toString()
                                         : quantity.toString(),
-                                    style: const TextStyle(fontSize: 14),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: colors.textPrimary,
+                                    ),
                                   ),
                                 ),
                                 SizedBox(
@@ -197,9 +202,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                     padding: const EdgeInsets.only(left: 4),
                                     child: Text(
                                       unitType,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.black87,
+                                        color: colors.textPrimary,
                                       ),
                                     ),
                                   ),
@@ -215,10 +220,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         children: [
                           Text(
                             "Rs $total",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                              color: colors.success,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -277,25 +282,29 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         // Bottom checkout bar
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            boxShadow: [BoxShadow(blurRadius: 5, color: Colors.black12)],
+          decoration: BoxDecoration(
+            color: colors.surface,
+            boxShadow: [BoxShadow(blurRadius: 5, color: colors.shadow)],
           ),
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Grand Total",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: colors.textPrimary,
+                    ),
                   ),
                   Text(
                     "Rs $grandTotal",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green,
+                      color: colors.success,
                     ),
                   ),
                 ],
@@ -312,7 +321,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kGreenColor,
+                    backgroundColor: colors.success,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

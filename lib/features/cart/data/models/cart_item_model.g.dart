@@ -8,14 +8,16 @@ part of 'cart_item_model.dart';
 
 CartItemModel _$CartItemModelFromJson(Map<String, dynamic> json) =>
     CartItemModel(
-      product: ProductModel.fromJson(json['productId'] as Map<String, dynamic>),
+      product: json['productId'] == null
+          ? null
+          : ProductModel.fromJson(json['productId'] as Map<String, dynamic>),
       quantity: (json['quantity'] as num).toDouble(),
       id: json['_id'] as String?,
     );
 
 Map<String, dynamic> _$CartItemModelToJson(CartItemModel instance) =>
     <String, dynamic>{
-      'productId': instance.product.toJson(),
+      'productId': instance.product?.toJson(),
       '_id': instance.id,
       'quantity': instance.quantity,
     };

@@ -1,4 +1,5 @@
 import 'package:farm_express/core/api/api_endpoints.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
@@ -6,7 +7,7 @@ class ProductCard extends StatelessWidget {
   final String title;
   final String quantity;
   final String price;
-  final String status; 
+  final String status;
 
   const ProductCard({
     super.key,
@@ -19,13 +20,16 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = _getStatusColor(status);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lightColors = AppColorsLight();
+    final darkColors = AppColorsDark();
+    final statusColor = _getStatusColor(status, isDark);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? darkColors.surface : lightColors.surface,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -76,10 +80,7 @@ class ProductCard extends StatelessWidget {
                 /// Quantity
                 Text(
                   quantity,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 ),
 
                 const SizedBox(height: 8),
@@ -110,10 +111,12 @@ class ProductCard extends StatelessWidget {
           /// Price
           Text(
             price,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.green,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.lightGreen
+                  : Colors.green,
             ),
           ),
         ],
@@ -122,16 +125,19 @@ class ProductCard extends StatelessWidget {
   }
 
   /// Backend Status Colors
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(String status, bool isDark) {
+    final light = AppColorsLight();
+    final dark = AppColorsDark();
+
     switch (status) {
       case "Growing":
         return Colors.orange;
       case "Ready":
-        return Colors.green;
+        return isDark ? dark.success : light.success;
       case "Sold":
-        return Colors.red;
+        return isDark ? dark.error : light.error;
       default:
-        return Colors.grey;
+        return isDark ? dark.textSecondary : light.textSecondary;
     }
   }
 }

@@ -24,7 +24,7 @@ ProductFetchModel _$ProductFetchModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ProductFetchModelToJson(ProductFetchModel instance) =>
     <String, dynamic>{
       '_id': instance.id,
-      'farmerId': instance.farmerId,
+      'farmerId': instance.farmerId?.toJson(),
       'productName': instance.productName,
       'price': instance.price,
       'unitType': instance.unitType,

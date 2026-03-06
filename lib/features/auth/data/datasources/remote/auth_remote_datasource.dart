@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:farm_express/core/api/api_endpoints.dart';
 import 'package:farm_express/core/api/app_client.dart';
 import 'package:farm_express/core/services/storage/token_service.dart';
 import 'package:farm_express/core/services/storage/user_session_service.dart';
 import 'package:farm_express/features/auth/data/datasources/auth_datasource.dart';
 import 'package:farm_express/features/auth/data/models/auth_api_model.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authRemoteProvider = Provider<IAuthRemoteDatasource>((ref) {
@@ -65,5 +68,47 @@ class AuthRemoteDatasource implements IAuthRemoteDatasource {
       return AuthApiModel.fromJson(userData);
     }
     return user;
+  }
+
+  @override
+  Future<bool> sendToken(String email) async {
+    try {
+      final response = await _apiClient.post(
+        ApiEndpoints.sendToken,
+        data: {"email": email},
+      );
+
+      // Ensure data is parsed as a Map
+      final data = response.data is String
+          ? jsonDecode(response.data) as Map<String, dynamic>
+          : response.data as Map<String, dynamic>;
+
+      if (data["success"] == true) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("sendToken error: $e");
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> resetToken(String token, String newPassword) async {
+    try {
+      final response = await _apiClient.post(
+        ApiEndpoints.resetPassword(token),
+        data: {"newPassword": newPassword},
+      );
+
+      // Fix: use bracket notation, not dot notation
+      if (response.data["success"] == true) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("resetToken error: $e");
+      return false;
+    }
   }
 }

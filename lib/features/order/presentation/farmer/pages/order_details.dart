@@ -10,26 +10,31 @@ class FarmerOrderDetailPage extends ConsumerWidget {
   static const _statusConfig = {
     'Pending': _StatusConfig(
       color: Color(0xFFFFF3E0),
+      darkColor: Color(0xFF3D2800),
       textColor: Color(0xFFE65100),
       icon: Icons.hourglass_empty_rounded,
     ),
     'Accepted': _StatusConfig(
       color: Color(0xFFE3F2FD),
+      darkColor: Color(0xFF0D1F3C),
       textColor: Color(0xFF1565C0),
       icon: Icons.thumb_up_rounded,
     ),
     'Shipped': _StatusConfig(
       color: Color(0xFFF3E5F5),
+      darkColor: Color(0xFF2A0A3A),
       textColor: Color(0xFF6A1B9A),
       icon: Icons.local_shipping_rounded,
     ),
     'Delivered': _StatusConfig(
       color: Color(0xFFE8F5E9),
+      darkColor: Color(0xFF0A2E0A),
       textColor: Color(0xFF2E7D32),
       icon: Icons.check_circle_rounded,
     ),
     'Cancelled': _StatusConfig(
       color: Color(0xFFFFEBEE),
+      darkColor: Color(0xFF3A0A0A),
       textColor: Color(0xFFC62828),
       icon: Icons.cancel_rounded,
     ),
@@ -45,18 +50,8 @@ class FarmerOrderDetailPage extends ConsumerWidget {
 
   static String _monthName(int month) {
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return months[month - 1];
   }
@@ -65,8 +60,10 @@ class FarmerOrderDetailPage extends ConsumerWidget {
       'Rs.${amount.toStringAsFixed(2)}';
 
   void _showStatusPicker(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
+      backgroundColor: isDark ? const Color(0xFF1E2D1E) : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -76,12 +73,14 @@ class FarmerOrderDetailPage extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Update Order Status',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF1B2E1B),
+                color: isDark
+                    ? const Color(0xFFE0F2E0)
+                    : const Color(0xFF1B2E1B),
               ),
             ),
             const SizedBox(height: 16),
@@ -93,7 +92,7 @@ class FarmerOrderDetailPage extends ConsumerWidget {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withOpacity(isDark ? 0.2 : 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: color, size: 18),
@@ -102,7 +101,11 @@ class FarmerOrderDetailPage extends ConsumerWidget {
                   label,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: isCurrent ? color : const Color(0xFF1B2E1B),
+                    color: isCurrent
+                        ? color
+                        : (isDark
+                            ? const Color(0xFFE0F2E0)
+                            : const Color(0xFF1B2E1B)),
                   ),
                 ),
                 trailing: isCurrent
@@ -140,11 +143,12 @@ class FarmerOrderDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final statusKey = order.orderStatus ?? 'Pending';
-    final config =
-        _statusConfig[statusKey] ??
+    final config = _statusConfig[statusKey] ??
         const _StatusConfig(
           color: Color(0xFFF5F5F5),
+          darkColor: Color(0xFF2A2A2A),
           textColor: Color(0xFF616161),
           icon: Icons.help_outline_rounded,
         );
@@ -154,7 +158,8 @@ class FarmerOrderDetailPage extends ConsumerWidget {
         : '—';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FAF7),
+      backgroundColor:
+          isDark ? const Color(0xFF121F12) : const Color(0xFFF7FAF7),
       body: CustomScrollView(
         slivers: [
           // ─── App Bar ───────────────────────────────────────────────────────
@@ -219,7 +224,7 @@ class FarmerOrderDetailPage extends ConsumerWidget {
                       horizontal: 16,
                     ),
                     decoration: BoxDecoration(
-                      color: config.color,
+                      color: isDark ? config.darkColor : config.color,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: config.textColor.withOpacity(0.2),
@@ -258,7 +263,9 @@ class FarmerOrderDetailPage extends ConsumerWidget {
                             vertical: 5,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: isDark
+                                ? const Color(0xFF1E2D1E)
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: config.textColor.withOpacity(0.15),
@@ -297,7 +304,8 @@ class FarmerOrderDetailPage extends ConsumerWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF2E7D32),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -309,7 +317,7 @@ class FarmerOrderDetailPage extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
-                  // ─── Consumer Details ────────────────────────────────────
+                  // ─── Customer Details ────────────────────────────────────
                   _SectionCard(
                     title: 'Customer Details',
                     icon: Icons.person_rounded,
@@ -407,12 +415,14 @@ class FarmerOrderDetailPage extends ConsumerWidget {
                                 color: Color(0xFF2E7D32),
                               ),
                               const SizedBox(width: 10),
-                              const Text(
+                              Text(
                                 'Total Amount',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF1B2E1B),
+                                  color: isDark
+                                      ? const Color(0xFFE0F2E0)
+                                      : const Color(0xFF1B2E1B),
                                 ),
                               ),
                               const Spacer(),
@@ -457,15 +467,18 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E2D1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x08000000),
+            color: isDark
+                ? const Color(0x28000000)
+                : const Color(0x08000000),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -479,24 +492,33 @@ class _SectionCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0F7F0),
+                    color: isDark
+                        ? const Color(0xFF263826)
+                        : const Color(0xFFF0F7F0),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, size: 16, color: const Color(0xFF2E7D32)),
+                  child:
+                      Icon(icon, size: 16, color: const Color(0xFF2E7D32)),
                 ),
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1B2E1B),
+                    color: isDark
+                        ? const Color(0xFFE0F2E0)
+                        : const Color(0xFF1B2E1B),
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF0F4F0)),
+          Divider(
+            height: 1,
+            color:
+                isDark ? const Color(0xFF2A3E2A) : const Color(0xFFF0F4F0),
+          ),
           child,
         ],
       ),
@@ -519,18 +541,26 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF9EB09E)),
+          Icon(
+            icon,
+            size: 16,
+            color:
+                isDark ? const Color(0xFF6B8A6B) : const Color(0xFF9EB09E),
+          ),
           const SizedBox(width: 10),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: Color(0xFF9EB09E),
+              color: isDark
+                  ? const Color(0xFF6B8A6B)
+                  : const Color(0xFF9EB09E),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -540,9 +570,11 @@ class _DetailRow extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.right,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: Color(0xFF1B2E1B),
+                color: isDark
+                    ? const Color(0xFFE0F2E0)
+                    : const Color(0xFF1B2E1B),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -565,6 +597,7 @@ class _ProductItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -574,7 +607,9 @@ class _ProductItemRow extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F7F0),
+              color: isDark
+                  ? const Color(0xFF263826)
+                  : const Color(0xFFF0F7F0),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
@@ -590,18 +625,22 @@ class _ProductItemRow extends StatelessWidget {
               children: [
                 Text(
                   item.productName ?? '—',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1B2E1B),
+                    color: isDark
+                        ? const Color(0xFFE0F2E0)
+                        : const Color(0xFF1B2E1B),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${item.quantity} ${item.unitType ?? ''} × ${_formatCurrency((item.price ?? 0).toDouble())}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF9EB09E),
+                    color: isDark
+                        ? const Color(0xFF6B8A6B)
+                        : const Color(0xFF9EB09E),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -628,18 +667,26 @@ class _Divider extends StatelessWidget {
   const _Divider();
 
   @override
-  Widget build(BuildContext context) =>
-      const Divider(height: 1, color: Color(0xFFF0F4F0), indent: 42);
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Divider(
+      height: 1,
+      color: isDark ? const Color(0xFF2A3E2A) : const Color(0xFFF0F4F0),
+      indent: 42,
+    );
+  }
 }
 
 // ─── Status Config ────────────────────────────────────────────────────────────
 
 class _StatusConfig {
   final Color color;
+  final Color darkColor;
   final Color textColor;
   final IconData icon;
   const _StatusConfig({
     required this.color,
+    required this.darkColor,
     required this.textColor,
     required this.icon,
   });

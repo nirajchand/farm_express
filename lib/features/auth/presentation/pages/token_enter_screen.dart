@@ -1,58 +1,32 @@
-// forgot_password_screen.dart
+// token_enter_screen.dart
 
-import 'package:farm_express/features/auth/presentation/pages/token_enter_screen.dart';
-import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
-import 'package:farm_express/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:farm_express/features/auth/presentation/pages/reset_password_screen.dart';
 import 'package:farm_express/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ForgotPasswordPage extends ConsumerStatefulWidget {
-  const ForgotPasswordPage({super.key});
+class EnterTokenPage extends ConsumerStatefulWidget {
+  const EnterTokenPage({super.key});
 
   @override
-  ConsumerState<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+  ConsumerState<EnterTokenPage> createState() => _EnterTokenPageState();
 }
 
-class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
-  final _emailController = TextEditingController();
+class _EnterTokenPageState extends ConsumerState<EnterTokenPage> {
+  final _tokenController = TextEditingController();
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _tokenController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authViewModelProvider);
-    final isLoading = authState.status == AuthStatus.loading;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = isDark
         ? AppColors.getDark() as dynamic
         : AppColors.getLight() as dynamic;
-
-    ref.listen(authViewModelProvider, (previous, next) {
-      if (next.status == AuthStatus.tokenSent) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Token sent! Check your email."),
-            backgroundColor: colors.success,
-          ),
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const EnterTokenPage()),
-        );
-      } else if (next.status == AuthStatus.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage ?? "Something went wrong"),
-            backgroundColor: colors.error,
-          ),
-        );
-      }
-    });
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -69,7 +43,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               ),
               const SizedBox(height: 20),
               Text(
-                "Forgot Password?",
+                "Enter Token",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -78,20 +52,22 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               ),
               const SizedBox(height: 12),
               Text(
-                "Enter your email address and we'll send you a token to reset your password.",
+                "Paste the token you received in your email.",
                 style: TextStyle(fontSize: 16, color: colors.textSecondary),
               ),
               const SizedBox(height: 40),
               TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
+                controller: _tokenController,
                 style: TextStyle(color: colors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: "Email Address",
+                  labelText: "Reset Token",
                   labelStyle: TextStyle(color: colors.textSecondary),
-                  hintText: "example@email.com",
+                  hintText: "Paste token here",
                   hintStyle: TextStyle(color: colors.textHint),
-                  prefixIcon: Icon(Icons.email_outlined, color: colors.primary),
+                  prefixIcon: Icon(
+                    Icons.vpn_key_outlined,
+                    color: colors.primary,
+                  ),
                   filled: true,
                   fillColor: colors.surfaceVariant,
                   border: OutlineInputBorder(
@@ -109,15 +85,17 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: isLoading
-                      ? null
-                      : () {
-                          ref
-                              .read(authViewModelProvider.notifier)
-                              .sendResetToken(
-                                email: _emailController.text.trim(),
-                              );
-                        },
+                  onPressed: () {
+                    if (_tokenController.text.trim().isEmpty) return;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ResetPasswordPage(
+                          token: _tokenController.text.trim(),
+                        ),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colors.primary,
                     foregroundColor: colors.white,
@@ -126,15 +104,10 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                     ),
                     elevation: 4,
                   ),
-                  child: isLoading
-                      ? CircularProgressIndicator(color: colors.white)
-                      : const Text(
-                          "Send Token",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ],

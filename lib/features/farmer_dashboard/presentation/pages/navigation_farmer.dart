@@ -1,5 +1,4 @@
 import 'package:farm_express/core/constants/colors.dart';
-import 'package:farm_express/features/farmer_dashboard/presentation/pages/farmer_dashboard.dart';
 import 'package:farm_express/features/farmer_profile/presentation/pages/farmer_profile_screen.dart';
 import 'package:farm_express/features/order/presentation/farmer/pages/farmer_order.dart';
 import 'package:farm_express/features/product/presentation/farmer/pages/farmer_product.dart';
@@ -9,10 +8,12 @@ class FarmerBottonNavigationScreen extends StatefulWidget {
   const FarmerBottonNavigationScreen({super.key});
 
   @override
-  State<FarmerBottonNavigationScreen> createState() => _FarmerBottonNavigationScreenState();
+  State<FarmerBottonNavigationScreen> createState() =>
+      _FarmerBottonNavigationScreenState();
 }
 
-class _FarmerBottonNavigationScreenState extends State<FarmerBottonNavigationScreen> {
+class _FarmerBottonNavigationScreenState
+    extends State<FarmerBottonNavigationScreen> {
   int _selectedIndex = 0;
 
   List<Widget> lstBottomScreen = [
@@ -23,13 +24,17 @@ class _FarmerBottonNavigationScreenState extends State<FarmerBottonNavigationScr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF1F1F1F)
+          : Colors.white,
       body: SafeArea(child: lstBottomScreen[_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: kPrimaryColor,
-        unselectedItemColor: Colors.black,
+        unselectedItemColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white70
+            : Colors.black,
         iconSize: 30,
         selectedLabelStyle: TextStyle(
           fontSize: 16,
@@ -40,7 +45,10 @@ class _FarmerBottonNavigationScreenState extends State<FarmerBottonNavigationScr
           fontSize: 16,
         ),
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: "Products"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag),
+            label: "Products",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Orders"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],

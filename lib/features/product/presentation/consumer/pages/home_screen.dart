@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:farm_express/features/product/data/datasources/shake_datasource.dart';
 import 'package:farm_express/features/product/presentation/consumer/pages/view_product_details.dart';
 import 'package:farm_express/features/product/presentation/consumer/state/get_all_product_state.dart';
 import 'package:farm_express/features/product/presentation/consumer/view_model/get_all_product_viewmodel.dart';
@@ -17,13 +20,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentPage = 1;
   bool _isFetchingMore = false;
 
+  StreamSubscription? _shakeSubscription;
+
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(getAllProductViewModelProvider.notifier)
           .getAllProducts(page: _currentPage, size: 10);
+    });
+
+    _shakeSubscription = ref.read(shakeDatasourceProvider).onShake.listen((_) {
+      _refreshProducts();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Refreshing products...'),
+          duration: Duration(milliseconds: 700),
+        ),
+      );
     });
 
     _scrollController.addListener(_onScroll);
@@ -31,9 +47,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
+    _shakeSubscription?.cancel(); 
     _scrollController.dispose();
     super.dispose();
   }
+
 
   void _onScroll() {
     final maxScroll = _scrollController.position.maxScrollExtent;
@@ -74,6 +92,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final productState = ref.watch(getAllProductViewModelProvider);
+
+    ref.listen<AsyncValue<void>>(shakeStreamProvider, (_, next) {
+      next.whenData((_) {
+        _refreshProducts();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Refreshing products...'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      });
+    });
 
     return Scaffold(
       body: SafeArea(

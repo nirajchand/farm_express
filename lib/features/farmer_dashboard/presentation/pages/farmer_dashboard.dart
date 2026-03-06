@@ -1,18 +1,9 @@
 import 'package:farm_express/features/order/presentation/farmer/pages/farmer_order.dart';
 import 'package:farm_express/features/product/presentation/farmer/pages/add_products.dart';
 import 'package:farm_express/features/product/presentation/farmer/view_model/farmer_product_view_model.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// ── Color palette ────────────────────────────────────────────────────────────
-const kGreen = Color(0xFF2ECC52);
-const kGreenDark = Color(0xFF1BAA3D);
-const kGreenLight = Color(0xFFE9F9ED);
-const kWhite = Colors.white;
-const kTextDark = Color(0xFF1A1A1A);
-const kTextGrey = Color(0xFF8A8A8A);
-const kPurple = Color(0xFF7B61FF);
-const kPurpleLight = Color(0xFFB8A9FF);
 
 class FarmerHomeScreen extends ConsumerStatefulWidget {
   const FarmerHomeScreen({super.key});
@@ -33,27 +24,29 @@ class _FarmerHomeScreenState extends ConsumerState<FarmerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final productState = ref.watch(farmerProductViewModelProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark ? AppColorsDark() : AppColorsLight() as dynamic;
 
-    final productCount = productState.products?.length ?? 0;
+    final productCount = productState.products.length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F5),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _Header(),
+              _Header(colors: colors),
               const SizedBox(height: 24),
 
-              _StatsGrid(productCount: productCount),
+              _StatsGrid(productCount: productCount, colors: colors),
               const SizedBox(height: 20),
 
-              _WeatherCard(),
+              _WeatherCard(colors: colors),
               const SizedBox(height: 20),
 
-              _ActionButtons(),
+              _ActionButtons(colors: colors),
               const SizedBox(height: 20),
             ],
           ),
@@ -62,41 +55,50 @@ class _FarmerHomeScreenState extends ConsumerState<FarmerHomeScreen> {
     );
   }
 }
+
 // ── Header ───────────────────────────────────────────────────────────────────
 
 class _Header extends StatelessWidget {
+  final dynamic colors;
+
+  const _Header({required this.colors});
+
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'Farmers',
           style: TextStyle(
-            color: kGreen,
+            color: colors.secondary,
             fontSize: 28,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.5,
           ),
         ),
-        _NotificationBell(),
+        _NotificationBell(colors: colors),
       ],
     );
   }
 }
 
 class _NotificationBell extends StatelessWidget {
+  final dynamic colors;
+
+  const _NotificationBell({required this.colors});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: kGreenLight,
+        color: colors.secondaryLight,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: kGreen.withOpacity(0.15),
+            color: colors.secondary.withOpacity(0.15),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -105,15 +107,19 @@ class _NotificationBell extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          const Icon(Icons.notifications_outlined, color: kTextDark, size: 22),
+          Icon(
+            Icons.notifications_outlined,
+            color: colors.textPrimary,
+            size: 22,
+          ),
           Positioned(
             top: 10,
             right: 10,
             child: Container(
               width: 8,
               height: 8,
-              decoration: const BoxDecoration(
-                color: kGreen,
+              decoration: BoxDecoration(
+                color: colors.secondary,
                 shape: BoxShape.circle,
               ),
             ),
@@ -128,8 +134,9 @@ class _NotificationBell extends StatelessWidget {
 
 class _StatsGrid extends StatelessWidget {
   final int productCount;
+  final dynamic colors;
 
-  const _StatsGrid({required this.productCount});
+  const _StatsGrid({required this.productCount, required this.colors});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -140,8 +147,9 @@ class _StatsGrid extends StatelessWidget {
               child: _StatCard(
                 value: 'Rs 24,000',
                 label: 'THIS MONTH',
-                valueColor: kGreen,
+                valueColor: colors.secondary,
                 icon: Icons.trending_up_rounded,
+                colors: colors,
               ),
             ),
             const SizedBox(width: 14),
@@ -149,8 +157,9 @@ class _StatsGrid extends StatelessWidget {
               child: _StatCard(
                 value: '100',
                 label: 'ORDERS',
-                valueColor: kGreen,
+                valueColor: colors.secondary,
                 icon: Icons.receipt_long_rounded,
+                colors: colors,
               ),
             ),
           ],
@@ -162,8 +171,9 @@ class _StatsGrid extends StatelessWidget {
               child: _StatCard(
                 value: productCount.toString(),
                 label: 'PRODUCTS',
-                valueColor: kGreen,
+                valueColor: colors.secondary,
                 icon: Icons.inventory_2_rounded,
+                colors: colors,
               ),
             ),
             const SizedBox(width: 14),
@@ -171,9 +181,10 @@ class _StatsGrid extends StatelessWidget {
               child: _StatCard(
                 value: '4.5',
                 label: 'RATING',
-                valueColor: kGreen,
+                valueColor: colors.secondary,
                 icon: Icons.star_rounded,
                 iconColor: const Color(0xFFFFD700),
+                colors: colors,
                 showStar: true,
               ),
             ),
@@ -190,6 +201,7 @@ class _StatCard extends StatelessWidget {
   final Color valueColor;
   final IconData icon;
   final Color? iconColor;
+  final dynamic colors;
   final bool showStar;
 
   const _StatCard({
@@ -197,6 +209,7 @@ class _StatCard extends StatelessWidget {
     required this.label,
     required this.valueColor,
     required this.icon,
+    required this.colors,
     this.iconColor,
     this.showStar = false,
   });
@@ -206,7 +219,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       decoration: BoxDecoration(
-        color: kWhite,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -244,8 +257,8 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
-              color: kTextGrey,
+            style: TextStyle(
+              color: colors.textSecondary,
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.0,
@@ -258,6 +271,10 @@ class _StatCard extends StatelessWidget {
 }
 
 class _WeatherCard extends StatelessWidget {
+  final dynamic colors;
+
+  const _WeatherCard({required this.colors});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -288,7 +305,7 @@ class _WeatherCard extends StatelessWidget {
               const Text(
                 '24',
                 style: TextStyle(
-                  color: kWhite,
+                  color: Colors.white,
                   fontSize: 52,
                   fontWeight: FontWeight.w800,
                   height: 1,
@@ -299,7 +316,7 @@ class _WeatherCard extends StatelessWidget {
                 child: Text(
                   '°C',
                   style: TextStyle(
-                    color: kWhite,
+                    color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
                   ),
@@ -323,7 +340,7 @@ class _WeatherCard extends StatelessWidget {
               const Text(
                 'Sunny',
                 style: TextStyle(
-                  color: kWhite,
+                  color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -333,14 +350,14 @@ class _WeatherCard extends StatelessWidget {
                 width: 5,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: kWhite.withOpacity(0.7),
+                  color: Colors.white.withOpacity(0.7),
                   shape: BoxShape.circle,
                 ),
               ),
               const Text(
                 'Perfect for harvest',
                 style: TextStyle(
-                  color: kWhite,
+                  color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -354,6 +371,10 @@ class _WeatherCard extends StatelessWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
+  final dynamic colors;
+
+  const _ActionButtons({required this.colors});
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -361,16 +382,16 @@ class _ActionButtons extends StatelessWidget {
         Expanded(
           child: _ActionButton(
             label: 'Add product',
-            backgroundColor: kGreenLight,
-            foregroundColor: kGreen,
+            backgroundColor: colors.primaryContainer,
+            foregroundColor: colors.primary,
             child: Container(
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: kWhite.withOpacity(0.7),
+                color: colors.surface.withOpacity(0.7),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.add_rounded, color: kGreen, size: 32),
+              child: Icon(Icons.add_rounded, color: colors.primary, size: 32),
             ),
             onTap: () {
               Navigator.push(
@@ -385,7 +406,7 @@ class _ActionButtons extends StatelessWidget {
           child: _ActionButton(
             label: 'Manage Orders',
             backgroundColor: const Color(0xFFF3EFFF),
-            foregroundColor: kPurple,
+            foregroundColor: colors.accent,
             child: Image.asset(
               'assets/images/box.png',
               width: 52,
@@ -394,18 +415,21 @@ class _ActionButtons extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: kWhite.withOpacity(0.6),
+                  color: colors.surface.withOpacity(0.6),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.inventory_2_rounded,
-                  color: kPurple,
+                  color: colors.accent,
                   size: 30,
                 ),
               ),
             ),
             onTap: () {
-              Navigator.push(context,MaterialPageRoute(builder: (_) => FarmerOrdersPage()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => FarmerOrdersPage()),
+              );
             },
           ),
         ),

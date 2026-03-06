@@ -1,6 +1,6 @@
 import 'package:farm_express/core/constants/hive_table_constant.dart';
 import 'package:farm_express/features/auth/domain/entities/auth_entity.dart';
-import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
+
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
@@ -32,7 +32,7 @@ class AuthHiveModel extends HiveObject {
     required this.email,
     this.password,
     this.confirmPassword,
-    required this.userType
+    required this.userType,
   }) : userId = userId ?? Uuid().v4();
 
   // From entity
@@ -43,7 +43,7 @@ class AuthHiveModel extends HiveObject {
       email: entity.email,
       password: entity.password,
       confirmPassword: entity.confirmPassword,
-      userType: entity.userType
+      userType: entity.userType,
     );
   }
 
@@ -55,7 +55,7 @@ class AuthHiveModel extends HiveObject {
       email: email,
       password: password,
       confirmPassword: confirmPassword,
-      userType: userType
+      userType: userType,
     );
   }
 

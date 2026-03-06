@@ -3,6 +3,7 @@ import 'package:farm_express/features/cart/presentation/pages/cart_screen.dart';
 import 'package:farm_express/features/consumer_profile/presentation/pages/profile_screen.dart';
 import 'package:farm_express/features/dashboard/presentation/pages/bottomScreen/search_screen.dart';
 import 'package:farm_express/features/product/presentation/consumer/pages/home_screen.dart';
+
 import 'package:flutter/material.dart';
 
 class BottonNavigationScreen extends StatefulWidget {
@@ -25,13 +26,17 @@ class _BottonNavigationScreenState extends State<BottonNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF1F1F1F)
+          : Colors.white,
       body: SafeArea(child: lstBottomScreen[_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: kPrimaryColor,
-        unselectedItemColor: Colors.black,
+        unselectedItemColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white70
+            : Colors.black,
         iconSize: 30,
         selectedLabelStyle: TextStyle(
           fontSize: 16,

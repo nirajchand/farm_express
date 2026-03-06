@@ -1,6 +1,7 @@
 import 'package:farm_express/features/product/presentation/consumer/pages/view_product_details.dart';
 import 'package:farm_express/features/product/presentation/consumer/state/get_all_product_state.dart';
 import 'package:farm_express/features/product/presentation/consumer/view_model/get_all_product_viewmodel.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:farm_express/widgets/my_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +25,6 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
   bool _isSearchFocused = false;
 
   static const _green = Color(0xFF2E7D32);
-  static const _lightGreen = Color(0xFFE8F5E9);
 
   @override
   void initState() {
@@ -107,52 +107,54 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
   @override
   Widget build(BuildContext context) {
     final productState = ref.watch(getAllProductViewModelProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark
+        ? AppColors.getDark() as dynamic
+        : AppColors.getLight() as dynamic;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: colors.background,
         elevation: 0,
-        title: const Text(
+        title: Text(
           "Search Products",
           style: TextStyle(
-            color: Colors.black,
+            color: colors.textPrimary,
             fontWeight: FontWeight.w700,
             fontSize: 20,
             letterSpacing: 0.3,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: colors.textPrimary),
       ),
       body: Column(
         children: [
-          // ── Professional Search Bar ──────────────────────────────
+          // ── Search Bar ───────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: _isSearchFocused
                     ? [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.25),
+                          color: colors.shadow.withOpacity(0.25),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
                       ]
                     : [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: colors.shadow.withOpacity(0.1),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
                       ],
                 border: Border.all(
-                  color: _isSearchFocused
-                      ? _green
-                      : Colors.grey.shade200, // green focus
+                  color: _isSearchFocused ? colors.primary : colors.border,
                   width: 1.5,
                 ),
               ),
@@ -162,8 +164,8 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                   Icon(
                     Icons.search_rounded,
                     color: _isSearchFocused
-                        ? _green
-                        : Colors.grey.shade400, // green
+                        ? colors.primary
+                        : colors.textSecondary,
                     size: 22,
                   ),
                   const SizedBox(width: 8),
@@ -173,15 +175,15 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                       focusNode: _focusNode,
                       textInputAction: TextInputAction.search,
                       onSubmitted: (_) => _search(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
-                        color: Color(0xFF1A1A1A),
+                        color: colors.textPrimary,
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
                         hintText: "Search fresh products...",
                         hintStyle: TextStyle(
-                          color: Colors.grey.shade400,
+                          color: colors.textHint,
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                         ),
@@ -200,13 +202,13 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                         margin: const EdgeInsets.only(right: 6),
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: colors.surfaceVariant,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.close_rounded,
                           size: 16,
-                          color: Colors.grey,
+                          color: colors.textSecondary,
                         ),
                       ),
                     ),
@@ -219,13 +221,13 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: _green, // green search button
+                        color: colors.primary,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Search",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: colors.white,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
@@ -236,14 +238,15 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
               ),
             ),
           ),
+
           // ── Product Grid ─────────────────────────────────────────
           Expanded(
             child: Builder(
               builder: (_) {
                 if (productState.status == GetAllProductStateStatus.loading &&
                     currentPage == 1) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: _green),
+                  return Center(
+                    child: CircularProgressIndicator(color: colors.primary),
                   );
                 }
 
@@ -257,13 +260,13 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                         Icon(
                           Icons.error_outline_rounded,
                           size: 48,
-                          color: Colors.red.shade300,
+                          color: colors.error,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           productState.errorMessage ??
                               "Failed to load products",
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(color: colors.error),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -280,15 +283,15 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                         Icon(
                           Icons.search_off_rounded,
                           size: 56,
-                          color: Colors.grey.shade300,
+                          color: colors.greyLight,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           currentSearch.isEmpty
                               ? "No products available"
-                              : "No results for \"$currentSearch\"",
+                              : 'No results for "$currentSearch"',
                           style: TextStyle(
-                            color: Colors.grey.shade500,
+                            color: colors.textSecondary,
                             fontSize: 15,
                           ),
                         ),
@@ -312,16 +315,15 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                       ? products.length + 2
                       : products.length,
                   itemBuilder: (context, index) {
-                    // Loading shimmer tiles at the end
                     if (index >= products.length) {
                       return Container(
                         decoration: BoxDecoration(
-                          color: _lightGreen,
+                          color: colors.successContainer,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: CircularProgressIndicator(
-                            color: _green,
+                            color: colors.primary,
                             strokeWidth: 2,
                           ),
                         ),

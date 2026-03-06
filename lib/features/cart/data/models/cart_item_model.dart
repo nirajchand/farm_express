@@ -7,15 +7,12 @@ part 'cart_item_model.g.dart';
 @JsonSerializable(explicitToJson: true)
 class CartItemModel {
   @JsonKey(name: "productId")
-  final ProductModel product;
+  final ProductModel? product;
   @JsonKey(name: "_id")
   final String? id;
   final double quantity;
 
-  const CartItemModel({
-    required this.product,
-    required this.quantity, this.id,
-  });
+  const CartItemModel({this.product, required this.quantity, this.id});
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) =>
       _$CartItemModelFromJson(json);
@@ -24,7 +21,7 @@ class CartItemModel {
 
   CartItemEntity toEntity() {
     return CartItemEntity(
-      product: product.toEntity(),
+      product: product?.toEntity(),
       quantity: quantity,
       id: id,
     );

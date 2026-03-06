@@ -2,6 +2,7 @@ import 'package:farm_express/core/api/api_endpoints.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/cart/presentation/view_model/get_cart_view_model.dart';
 import 'package:farm_express/features/product/domain/entities/product_entities.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,7 +18,6 @@ class ProductDetailsPage extends ConsumerStatefulWidget {
 
 class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
   int quantity = 1;
-
   late String productStatus;
 
   @override
@@ -26,16 +26,16 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
     productStatus = widget.product.status ?? 'Unknown';
   }
 
-  Color get statusColor {
+  Color _statusColor(dynamic colors) {
     switch (productStatus) {
       case 'Growing':
-        return const Color(0xFFF57F17);
+        return colors.warning;
       case 'Ready':
-        return const Color(0xFF2E7D32);
+        return colors.success;
       case 'Sold':
-        return const Color(0xFFC62828);
+        return colors.error;
       default:
-        return Colors.grey;
+        return colors.textSecondary;
     }
   }
 
@@ -52,9 +52,10 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
     }
   }
 
-  Widget _QuantityButton({
+  Widget _quantityButton({
     required IconData icon,
     required VoidCallback onTap,
+    required dynamic colors,
     bool isPrimary = false,
   }) {
     return InkWell(
@@ -63,18 +64,14 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: isPrimary ? const Color(0xFF2E7D32) : Colors.white,
-          border: Border.all(
-            color: isPrimary
-                ? const Color(0xFF2E7D32)
-                : const Color(0xFFE0E0E0),
-          ),
+          color: isPrimary ? colors.success : colors.surface,
+          border: Border.all(color: isPrimary ? colors.success : colors.border),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Icon(
           icon,
           size: 18,
-          color: isPrimary ? Colors.white : const Color(0xFF2E7D32),
+          color: isPrimary ? colors.white : colors.success,
         ),
       ),
     );
@@ -82,34 +79,41 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark
+        ? AppColors.getDark() as dynamic
+        : AppColors.getLight() as dynamic;
     final product = widget.product;
+    final statusColor = _statusColor(colors);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: CustomScrollView(
                 slivers: [
+                  // ─── App Bar with Hero Image ──────────────────────────────
                   SliverAppBar(
                     expandedHeight: 280,
                     pinned: true,
-                    backgroundColor: Colors.white,
+                    backgroundColor: colors.surface,
                     leading: IconButton(
                       icon: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colors.surface,
                           shape: BoxShape.circle,
                           boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 8,
-                            ),
+                            BoxShadow(color: colors.shadow, blurRadius: 8),
                           ],
                         ),
-                        child: const Icon(Icons.arrow_back, size: 20),
+                        child: Icon(
+                          Icons.arrow_back,
+                          size: 20,
+                          color: colors.textPrimary,
+                        ),
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -123,11 +127,11 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
-                                color: const Color(0xFFE8F5E9),
-                                child: const Icon(
+                                color: colors.successContainer,
+                                child: Icon(
                                   Icons.image_not_supported_outlined,
                                   size: 80,
-                                  color: Color(0xFF81C784),
+                                  color: colors.successLight,
                                 ),
                               );
                             },
@@ -144,7 +148,9 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                                   end: Alignment.bottomCenter,
                                   colors: [
                                     Colors.transparent,
-                                    Colors.black.withOpacity(0.1),
+                                    Colors.black.withOpacity(
+                                      isDark ? 0.3 : 0.1,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -159,9 +165,9 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Product Info
+                        // ─── Product Info ─────────────────────────────────
                         Container(
-                          color: Colors.white,
+                          color: colors.surface,
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,10 +183,10 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                                         Text(
                                           product.productName ??
                                               'Unknown Product',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF1B5E20),
+                                            color: colors.primaryDark,
                                             letterSpacing: -0.3,
                                           ),
                                         ),
@@ -189,20 +195,23 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                                           product.description ?? '',
                                           style: TextStyle(
                                             fontSize: 13,
-                                            color: Colors.grey[600],
+                                            color: colors.textSecondary,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
                                   const SizedBox(width: 12),
+                                  // Status Badge
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 12,
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: statusColor.withOpacity(0.1),
+                                      color: statusColor.withOpacity(
+                                        isDark ? 0.2 : 0.1,
+                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
                                         color: statusColor.withOpacity(0.4),
@@ -231,23 +240,23 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              // Price
+                              // Price Row
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
                                     'Rs ${product.price ?? '0'}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 26,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF1B5E20),
+                                      color: colors.success,
                                     ),
                                   ),
                                   Text(
                                     '/kg',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: Colors.grey[500],
+                                      color: colors.textSecondary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -256,7 +265,7 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                                     '${product.quantity ?? 0} ${product.unitType} available',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: Colors.grey[500],
+                                      color: colors.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -266,9 +275,10 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                         ),
 
                         const SizedBox(height: 8),
-                        // Quantity Selector
+
+                        // ─── Quantity Selector ────────────────────────────
                         Container(
-                          color: Colors.white,
+                          color: colors.surface,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 14,
@@ -280,21 +290,20 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.grey[800],
+                                  color: colors.textPrimary,
                                 ),
                               ),
                               const Spacer(),
                               Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: const Color(0xFFE0E0E0),
-                                  ),
+                                  border: Border.all(color: colors.border),
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                                 child: Row(
                                   children: [
-                                    _QuantityButton(
+                                    _quantityButton(
                                       icon: Icons.remove,
+                                      colors: colors,
                                       onTap: () {
                                         if (quantity > 1)
                                           setState(() => quantity--);
@@ -305,14 +314,16 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                                       child: Text(
                                         '$quantity',
                                         textAlign: TextAlign.center,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
+                                          color: colors.textPrimary,
                                         ),
                                       ),
                                     ),
-                                    _QuantityButton(
+                                    _quantityButton(
                                       icon: Icons.add,
+                                      colors: colors,
                                       onTap: () => setState(() => quantity++),
                                       isPrimary: true,
                                     ),
@@ -323,90 +334,54 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                           ),
                         ),
 
-                        // Farm Info
+                        // ─── Farm Info ────────────────────────────────────
                         Container(
-                          color: Colors.white,
+                          color: colors.surface,
                           padding: const EdgeInsets.all(16),
-                          margin: const EdgeInsets.only(bottom: 8),
+                          margin: const EdgeInsets.only(top: 8, bottom: 8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Farm Information',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF212121),
+                                  color: colors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.agriculture_outlined,
-                                    color: Color(0xFF2E7D32),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      product.farmer?.farmName ??
-                                          'Unknown Farm',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF212121),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              _infoRow(
+                                icon: Icons.agriculture_outlined,
+                                value:
+                                    product.farmer?.farmName ?? 'Unknown Farm',
+                                isBold: true,
+                                colors: colors,
                               ),
                               const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_on_outlined,
-                                    color: Color(0xFF2E7D32),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      product.farmer?.farmLocation ?? '',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              _infoRow(
+                                icon: Icons.location_on_outlined,
+                                value: product.farmer?.farmLocation ?? '',
+                                colors: colors,
                               ),
                               const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.phone_outlined,
-                                    color: Color(0xFF2E7D32),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      product.farmer?.phoneNumber ?? '',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              _infoRow(
+                                icon: Icons.phone_outlined,
+                                value: product.farmer?.phoneNumber ?? '',
+                                colors: colors,
                               ),
-                              const SizedBox(height: 12),
-                              Text(
-                                product.farmer?.description ?? '',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[700],
-                                  height: 1.5,
+                              if ((product.farmer?.description ?? '')
+                                  .isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                Text(
+                                  product.farmer?.description ?? '',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colors.textSecondary,
+                                    height: 1.5,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                         ),
@@ -417,14 +392,14 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
               ),
             ),
 
-            // Add to Cart
+            // ─── Add to Cart Bar ──────────────────────────────────────
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: colors.shadow.withOpacity(isDark ? 0.4 : 0.08),
                     blurRadius: 12,
                     offset: const Offset(0, -4),
                   ),
@@ -438,19 +413,14 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                       ? null
                       : () async {
                           try {
-                            // Call your add to cart function here
-
                             ref
                                 .read(getCartViewModelProvider.notifier)
                                 .addToCart(product.id ?? '', quantity);
-
-                            // Show confirmation
                             SnackbarUtils.showSuccess(
                               context,
                               "Added to cart successfully!",
                             );
                           } catch (e) {
-                            // Show error if fails
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("Failed to add to cart: $e"),
@@ -460,9 +430,10 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2E7D32),
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.grey[300],
+                    backgroundColor: colors.success,
+                    foregroundColor: colors.white,
+                    disabledBackgroundColor: colors.greyLight,
+                    disabledForegroundColor: colors.textSecondary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -482,6 +453,30 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _infoRow({
+    required IconData icon,
+    required String value,
+    required dynamic colors,
+    bool isBold = false,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: colors.success),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
+              color: isBold ? colors.textPrimary : colors.textSecondary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

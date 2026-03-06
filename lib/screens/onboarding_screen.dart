@@ -1,5 +1,5 @@
-import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/screens/choose_role_screen.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -32,13 +32,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       "image": "assets/images/healthy.jpg",
     },
   ];
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark
+        ? AppColors.getDark() as dynamic
+        : AppColors.getLight() as dynamic;
+
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: colors.background,
+      appBar: AppBar(backgroundColor: colors.background, elevation: 0),
       body: Container(
-        margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         child: Column(
           children: [
             Align(
@@ -54,7 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 child: Text(
                   "Skip",
-                  style: TextStyle(fontSize: 18, color: Colors.blueAccent),
+                  style: TextStyle(fontSize: 18, color: colors.info),
                 ),
               ),
             ),
@@ -63,24 +70,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: _data.length,
-                onPageChanged: (index) {
-                  setState(() {
-                    _pageIndex = index;
-                  });
-                },
+                onPageChanged: (index) => setState(() => _pageIndex = index),
                 itemBuilder: (context, index) {
                   return SingleChildScrollView(
                     child: Column(
                       children: [
                         Container(
-                          margin: EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            boxShadow: const [
+                            boxShadow: [
                               BoxShadow(
-                                color: Colors.black26,
+                                color: isDark ? Colors.black45 : Colors.black26,
                                 blurRadius: 10,
-                                offset: Offset(0, 5),
+                                offset: const Offset(0, 5),
                               ),
                             ],
                           ),
@@ -93,20 +96,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                         ),
-
+                        const SizedBox(height: 12),
                         Text(
                           _data[index]["title"]!,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: kPrimaryColor,
+                            color: colors.primary,
                           ),
                         ),
+                        const SizedBox(height: 8),
                         Text(
                           _data[index]["desc"]!,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 15, color: Colors.black),
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: colors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -121,16 +128,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 _data.length,
                 (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  margin: EdgeInsets.only(right: 6),
+                  margin: const EdgeInsets.only(right: 6),
                   height: 10,
                   width: _pageIndex == index ? 25 : 10,
                   decoration: BoxDecoration(
-                    color: _pageIndex == index ? Colors.green : Colors.grey,
+                    color: _pageIndex == index
+                        ? colors.primary
+                        : colors.greyLight,
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.all(20),
               child: SizedBox(
@@ -138,7 +148,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimaryColor,
+                    backgroundColor: colors.primary,
+                    foregroundColor: colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: () {
                     if (_pageIndex == _data.length - 1) {
@@ -155,7 +169,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                   child: Text(
                     _pageIndex == _data.length - 1 ? "Get Started" : "Next",
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

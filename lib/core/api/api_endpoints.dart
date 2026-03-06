@@ -30,6 +30,8 @@ class ApiEndpoints {
   // ==========Auth endpoints ======
   static const String register = "/auth/register";
   static const String login = "/auth/login";
+  static const String sendToken = "/auth/request-password-reset";
+  static String resetPassword(String token) => "/auth/reset-password/$token";
 
   // ================ consumerProfile=======================
   static const String getProfile = "/consumer/getProfile";

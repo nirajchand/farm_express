@@ -1,4 +1,3 @@
-import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:farm_express/features/auth/presentation/state/auth_state.dart';
@@ -6,6 +5,7 @@ import 'package:farm_express/features/auth/presentation/view_model/auth_view_mod
 import 'package:farm_express/features/dashboard/presentation/pages/botton_navigation_screen.dart';
 import 'package:farm_express/features/auth/presentation/pages/signup_screen.dart';
 import 'package:farm_express/features/farmer_dashboard/presentation/pages/navigation_farmer.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:farm_express/widgets/elevated_button.dart';
 import 'package:farm_express/widgets/my_text_form_field.dart';
 import 'package:flutter/material.dart';
@@ -37,8 +37,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // auth State
-    // final authState = ref.watch(authViewModelProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark
+        ? AppColors.getDark() as dynamic
+        : AppColors.getLight() as dynamic;
 
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next.status == AuthStatus.error) {
@@ -58,22 +60,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       }
     });
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(backgroundColor: Colors.white),
+      backgroundColor: colors.background,
+      appBar: AppBar(backgroundColor: colors.background, elevation: 0),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Center(child: Image.asset("assets/images/project_logo.png")),
             Container(
               width: double.infinity,
-              margin: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+              margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(32),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF000000).withValues(alpha: 0.12),
+                    color: colors.shadow.withValues(alpha: 0.12),
                     offset: const Offset(0, 10),
                     blurRadius: 30,
                     spreadRadius: -5,
@@ -91,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
-                          color: kGreenColor,
+                          color: colors.primary,
                         ),
                       ),
                       Text(
@@ -99,18 +102,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: kGreenColor,
+                          color: colors.primary,
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       MyTextFormField(
                         controller: _emailController,
-                        labelText: "Email address ",
+                        labelText: "Email address",
                         hint: Text(
                           "e.g abc123@gmail.com",
-                          style: TextStyle(color: Colors.blueGrey),
+                          style: TextStyle(color: colors.textSecondary),
                         ),
-                        prefixIcon: Icon(Icons.email, color: kPrimaryColor),
+                        prefixIcon: Icon(Icons.email, color: colors.primary),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your email';
@@ -118,14 +121,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       MyTextFormField(
                         controller: _passwordController,
                         labelText: "Password",
-                        prefixIcon: Icon(Icons.lock, color: kPrimaryColor),
+                        prefixIcon: Icon(Icons.lock, color: colors.primary),
                         suffixiocn: Icon(
                           Icons.visibility_off,
-                          color: kPrimaryColor,
+                          color: colors.primary,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -149,36 +152,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             "Forget Password?",
                             style: TextStyle(
                               fontSize: 16,
-                              color: kGreenColor,
+                              color: colors.primary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ),
                       MyElevatedButton(
-                        onPressed: () {
-                          _login();
-                        },
-                        // backgroundColor: kPrimaryColor,
-                        // foregroundColor: Colors.white,
+                        onPressed: _login,
+                        backgroundColor: colors.primary,
+                        foregroundColor: colors.white,
                         text: "Sign In to Your Account",
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       TextButton(
                         onPressed: () {
-                          setState(() {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SignupScreen(),
-                              ),
-                            );
-                          });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignupScreen(),
+                            ),
+                          );
                         },
                         child: Text(
                           "Create new Account",
                           style: TextStyle(
-                            color: kPrimaryColor,
+                            color: colors.primary,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),

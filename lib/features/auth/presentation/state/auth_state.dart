@@ -8,24 +8,25 @@ enum AuthStatus {
   unauthenticated,
   registered,
   error,
+  tokenSent,
+  passwordReset,
 }
 
-enum UserRole {
-  farmer,
-  consumer
-}
+enum UserRole { farmer, consumer }
 
 class AuthState extends Equatable {
   final AuthStatus status;
   final String? errorMessage;
   final AuthEntity? user;
   final UserRole? userType;
+  final String? resetEmail;
 
   const AuthState({
     this.status = AuthStatus.initial,
     this.errorMessage,
     this.user,
-    this.userType
+    this.userType,
+    this.resetEmail,
   });
 
   // copywith
@@ -33,16 +34,18 @@ class AuthState extends Equatable {
     AuthStatus? status,
     String? errorMessage,
     AuthEntity? user,
-    UserRole? userType
+    UserRole? userType,
+    String? resetEmail,
   }) {
     return AuthState(
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       user: user ?? this.user,
-      userType: userType ?? this.userType
+      userType: userType ?? this.userType,
+      resetEmail: resetEmail ?? this.resetEmail,
     );
   }
 
   @override
-  List<Object?> get props => [status, errorMessage, user,userType];
+  List<Object?> get props => [status, errorMessage, user, userType,resetEmail];
 }

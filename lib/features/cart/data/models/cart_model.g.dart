@@ -9,7 +9,7 @@ part of 'cart_model.dart';
 CartCreateModel _$CartCreateModelFromJson(Map<String, dynamic> json) =>
     CartCreateModel(
       productId: json['productId'] as String?,
-      quantity: (json['quantity'] as num?)?.toInt(),
+      quantity: json['quantity'] as int?,
     );
 
 Map<String, dynamic> _$CartCreateModelToJson(CartCreateModel instance) =>

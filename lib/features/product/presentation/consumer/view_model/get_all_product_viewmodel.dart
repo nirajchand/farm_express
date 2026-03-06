@@ -1,7 +1,12 @@
 import 'package:farm_express/features/product/domain/usecases/get_all_products_usecases.dart';
+import 'package:farm_express/features/product/domain/usecases/shake_usecases.dart';
 import 'package:farm_express/features/product/presentation/consumer/state/get_all_product_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+final shakeStreamProvider = StreamProvider<void>((ref) {
+  ref.keepAlive();
+  return ref.read(listenToShakeUseCaseProvider).call();
+});
 final getAllProductViewModelProvider =
     NotifierProvider<GetAllProductsViewModel, GetAllProductState>(
       () => GetAllProductsViewModel(),
@@ -20,7 +25,7 @@ class GetAllProductsViewModel extends Notifier<GetAllProductState> {
     int page = 1,
     int size = 10,
     String? search,
-    bool append = false, 
+    bool append = false,
   }) async {
     state = state.copyWith(status: GetAllProductStateStatus.loading);
 
@@ -39,14 +44,11 @@ class GetAllProductsViewModel extends Notifier<GetAllProductState> {
         state = state.copyWith(
           status: GetAllProductStateStatus.success,
           products: append
-              ? [...?state.products, ...data.products] 
+              ? [...?state.products, ...data.products]
               : data.products,
-          pagination: data.pagination, 
+          pagination: data.pagination,
         );
       },
     );
   }
 }
-
-
-

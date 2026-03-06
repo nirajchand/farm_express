@@ -14,3 +14,5 @@ abstract interface class IProductRemoteDataSource {
   Future<bool> deleteProduct(String productId);
   Future<List<ProductApiModel>> getProductsByFarmerId();
 }
+
+

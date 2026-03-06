@@ -71,8 +71,12 @@ dependencies:
 
   # utilities
   uuid: ^4.3.3
-  json_annotation: ^4.8.1
+  json_annotation: ^4.9.0
   flutter_launcher_icons: ^0.14.4
+
+  sensors_plus: ^4.0.2
+  coverage: ^1.15.0
+  test_cov_console: ^0.2.2
 
 
 

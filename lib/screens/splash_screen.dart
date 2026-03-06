@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:farm_express/core/constants/colors.dart';
 import 'package:farm_express/core/services/storage/user_session_service.dart';
 import 'package:farm_express/features/dashboard/presentation/pages/botton_navigation_screen.dart';
 import 'package:farm_express/features/farmer_dashboard/presentation/pages/navigation_farmer.dart';
 import 'package:farm_express/screens/onboarding_screen.dart';
+import 'package:farm_express/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,7 +24,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       final isLoggedIn = userSessionService.isLoggedIn();
       final role = userSessionService.getRole()?.trim().toLowerCase();
       if (isLoggedIn) {
-        if(role == 'consumer') {
+        if (role == 'consumer') {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => BottonNavigationScreen()),
@@ -32,7 +32,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         } else if (role == 'farmer') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => FarmerBottonNavigationScreen()),
+            MaterialPageRoute(
+              builder: (context) => FarmerBottonNavigationScreen(),
+            ),
           );
         } else {
           // If role is unknown, navigate to onboarding or login
@@ -52,30 +54,33 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark ? AppColorsDark() : AppColorsLight() as dynamic;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(color: colors.surface),
         child: Column(
           children: [
-            Spacer(),
+            const Spacer(),
             Image.asset("assets/images/project_logo.png", width: 200),
-            Spacer(),
+            const Spacer(),
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+              valueColor: AlwaysStoppedAnimation<Color>(colors.primary),
               strokeWidth: 4,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               "Loading..",
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.grey[600],
+                color: colors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
           ],
         ),
       ),

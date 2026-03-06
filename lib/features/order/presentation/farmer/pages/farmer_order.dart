@@ -14,7 +14,6 @@ class FarmerOrdersPage extends ConsumerWidget {
     final vm = ref.read(farmerOrdersViewModelProvider.notifier);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FAF7),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,15 +43,16 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E2D1E) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Color(0x0A000000),
+            color: isDark ? const Color(0x28000000) : const Color(0x0A000000),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -62,20 +62,24 @@ class _Header extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'My Orders',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1B2E1B),
+                  color: isDark
+                      ? const Color(0xFFE0F2E0)
+                      : const Color(0xFF1B2E1B),
                   letterSpacing: -0.3,
                 ),
               ),
               Text(
                 '${state.orders.length} total orders',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: Color(0xFF6B8C6B),
+                  color: isDark
+                      ? const Color(0xFF7AAB7A)
+                      : const Color(0xFF6B8C6B),
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -184,7 +188,6 @@ class _FilterChips extends StatelessWidget {
   final String selected;
   final ValueChanged<String> onSelect;
 
-  // Updated to match new order statuses
   static const filters = [
     'All',
     'Pending',
@@ -198,6 +201,7 @@ class _FilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 48,
       child: ListView.separated(
@@ -214,12 +218,16 @@ class _FilterChips extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF2E7D32) : Colors.white,
+                color: isSelected
+                    ? const Color(0xFF2E7D32)
+                    : (isDark ? const Color(0xFF263826) : Colors.white),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isSelected
                       ? const Color(0xFF2E7D32)
-                      : const Color(0xFFDDE8DD),
+                      : (isDark
+                            ? const Color(0xFF3A5C3A)
+                            : const Color(0xFFDDE8DD)),
                 ),
                 boxShadow: isSelected
                     ? [
@@ -236,7 +244,11 @@ class _FilterChips extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white : const Color(0xFF4A6A4A),
+                  color: isSelected
+                      ? Colors.white
+                      : (isDark
+                            ? const Color(0xFF9ECE9E)
+                            : const Color(0xFF4A6A4A)),
                 ),
               ),
             ),
@@ -341,30 +353,34 @@ class _OrderCard extends StatelessWidget {
   final OrderEntity order;
   const _OrderCard({required this.order});
 
-  // Updated status config to match new statuses: Pending, Accepted, Shipped, Delivered, Cancelled
   static const _statusConfig = {
     'pending': _StatusConfig(
       color: Color(0xFFFFF3E0),
+      darkColor: Color(0xFF3D2800),
       textColor: Color(0xFFE65100),
       icon: Icons.hourglass_empty_rounded,
     ),
     'accepted': _StatusConfig(
       color: Color(0xFFE8EAF6),
+      darkColor: Color(0xFF1A1F4A),
       textColor: Color(0xFF3949AB),
       icon: Icons.thumb_up_alt_rounded,
     ),
     'shipped': _StatusConfig(
       color: Color(0xFFE1F5FE),
+      darkColor: Color(0xFF00243A),
       textColor: Color(0xFF0277BD),
       icon: Icons.local_shipping_rounded,
     ),
     'delivered': _StatusConfig(
       color: Color(0xFFE8F5E9),
+      darkColor: Color(0xFF0A2E0A),
       textColor: Color(0xFF2E7D32),
       icon: Icons.check_circle_rounded,
     ),
     'cancelled': _StatusConfig(
       color: Color(0xFFFFEBEE),
+      darkColor: Color(0xFF3A0A0A),
       textColor: Color(0xFFC62828),
       icon: Icons.cancel_rounded,
     ),
@@ -393,11 +409,13 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final statusKey = order.orderStatus?.toLowerCase() ?? 'pending';
     final config =
         _statusConfig[statusKey] ??
         const _StatusConfig(
           color: Color(0xFFF5F5F5),
+          darkColor: Color(0xFF2A2A2A),
           textColor: Color(0xFF616161),
           icon: Icons.help_outline_rounded,
         );
@@ -419,13 +437,13 @@ class _OrderCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E2D1E) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color(0x08000000),
+              color: isDark ? const Color(0x28000000) : const Color(0x08000000),
               blurRadius: 8,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -440,7 +458,9 @@ class _OrderCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0F7F0),
+                      color: isDark
+                          ? const Color(0xFF263826)
+                          : const Color(0xFFF0F7F0),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
@@ -455,17 +475,21 @@ class _OrderCard extends StatelessWidget {
                     children: [
                       Text(
                         'Order #${order.id?.substring(0, 8).toUpperCase() ?? '—'}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
-                          color: Color(0xFF1B2E1B),
+                          color: isDark
+                              ? const Color(0xFFE0F2E0)
+                              : const Color(0xFF1B2E1B),
                         ),
                       ),
                       Text(
                         dateStr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF9EB09E),
+                          color: isDark
+                              ? const Color(0xFF6B8A6B)
+                              : const Color(0xFF9EB09E),
                         ),
                       ),
                     ],
@@ -474,12 +498,18 @@ class _OrderCard extends StatelessWidget {
                   _StatusBadge(
                     config: config,
                     label: order.orderStatus ?? 'Pending',
+                    isDark: isDark,
                   ),
                 ],
               ),
 
-              const SizedBox(height: 12),
-              const Divider(height: 1, color: Color(0xFFF0F4F0)),
+              SizedBox(height: 12),
+              Divider(
+                height: 1,
+                color: isDark
+                    ? const Color(0xFF2A3E2A)
+                    : const Color(0xFFF0F4F0),
+              ),
               const SizedBox(height: 12),
 
               // Items preview
@@ -490,9 +520,11 @@ class _OrderCard extends StatelessWidget {
                           .map((i) => i.productName ?? '')
                           .join(', ') +
                       (itemCount > 2 ? ' +${itemCount - 2} more' : ''),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF4A6A4A),
+                    color: isDark
+                        ? const Color(0xFF9ECE9E)
+                        : const Color(0xFF4A6A4A),
                     fontWeight: FontWeight.w500,
                   ),
                   maxLines: 1,
@@ -563,10 +595,12 @@ class _OrderCard extends StatelessWidget {
 
 class _StatusConfig {
   final Color color;
+  final Color darkColor;
   final Color textColor;
   final IconData icon;
   const _StatusConfig({
     required this.color,
+    required this.darkColor,
     required this.textColor,
     required this.icon,
   });
@@ -575,14 +609,19 @@ class _StatusConfig {
 class _StatusBadge extends StatelessWidget {
   final _StatusConfig config;
   final String label;
-  const _StatusBadge({required this.config, required this.label});
+  final bool isDark;
+  const _StatusBadge({
+    required this.config,
+    required this.label,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: config.color,
+        color: isDark ? config.darkColor : config.color,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -611,14 +650,22 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 13, color: const Color(0xFF9EB09E)),
+        Icon(
+          icon,
+          size: 13,
+          color: isDark ? const Color(0xFF6B8A6B) : const Color(0xFF9EB09E),
+        ),
         const SizedBox(width: 3),
         Text(
           label,
-          style: const TextStyle(fontSize: 12, color: Color(0xFF9EB09E)),
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? const Color(0xFF6B8A6B) : const Color(0xFF9EB09E),
+          ),
           overflow: TextOverflow.ellipsis,
         ),
       ],
