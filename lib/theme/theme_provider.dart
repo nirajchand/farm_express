@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:farm_express/theme/app_colors.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:sensors_plus/sensors_plus.dart';
+import 'package:light/light.dart';
 
 // Theme mode provider to manage light/dark theme switching
 final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
@@ -37,7 +38,11 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 class AutoThemeNotifier extends StateNotifier<bool> {
   AutoThemeNotifier(this.ref) : super(false);
   final dynamic ref;
-  StreamSubscription? _accelerometerSubscription;
+  final Light _light = Light();
+  StreamSubscription<int>? _lightSubscription;
+
+  static const int _brightLuxThreshold = 120;
+  static const int _darkLuxThreshold = 40;
 
   void enableAutoTheme() {
     state = true;
@@ -50,29 +55,32 @@ class AutoThemeNotifier extends StateNotifier<bool> {
   }
 
   void _startListeningToSensor() {
-    _accelerometerSubscription =
-        accelerometerEventStream(
-          samplingPeriod: const Duration(seconds: 2),
-        ).listen((AccelerometerEvent event) {
-          // Use accelerometer Z-axis as a proxy for light detection
-          final lightIntensity = event.z.abs();
+    _stopListeningToSensor();
 
-          // Light threshold: if z-axis acceleration is high, it's likely a bright environment
-          if (lightIntensity > 8) {
-            // Bright environment - use light mode
-            ref.read(themeModeProvider.notifier).setLightTheme();
-            debugPrint('Light environment detected: Light Mode');
-          } else if (lightIntensity < 5) {
-            // Dark environment - use dark mode
-            ref.read(themeModeProvider.notifier).setDarkTheme();
-            debugPrint('Dark environment detected: Dark Mode');
-          }
-        });
+    if (kIsWeb) {
+      debugPrint('Auto theme via ALS is not supported on web.');
+      return;
+    }
+
+    _lightSubscription = _light.lightSensorStream.listen(
+      (int lux) {
+        if (lux >= _brightLuxThreshold) {
+          ref.read(themeModeProvider.notifier).setLightTheme();
+          debugPrint('Bright environment detected ($lux lux): Light Mode');
+        } else if (lux <= _darkLuxThreshold) {
+          ref.read(themeModeProvider.notifier).setDarkTheme();
+          debugPrint('Dark environment detected ($lux lux): Dark Mode');
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        debugPrint('Ambient light sensor error: $error');
+      },
+    );
   }
 
   void _stopListeningToSensor() {
-    _accelerometerSubscription?.cancel();
-    _accelerometerSubscription = null;
+    _lightSubscription?.cancel();
+    _lightSubscription = null;
   }
 
   @override
