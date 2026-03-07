@@ -1,3 +1,4 @@
+import 'package:farm_express/core/services/connectivity/network_info.dart';
 import 'package:farm_express/features/order/domain/entities/order_entity.dart';
 import 'package:farm_express/features/order/presentation/farmer/pages/order_details.dart';
 import 'package:farm_express/features/order/presentation/farmer/state/farmer_order_state.dart';
@@ -268,6 +269,86 @@ class _OrdersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isConnectedAsync = ref.watch(networkInfoFutureProvider);
+
+        return isConnectedAsync.when(
+          data: (isConnected) {
+            if (!isConnected) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.cloud_off_rounded,
+                      size: 48,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No internet connection',
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Please connect to view orders',
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Show orders when online
+            return _buildOrdersList(context);
+          },
+          loading: () => const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF2E7D32),
+              strokeWidth: 2.5,
+            ),
+          ),
+          error: (err, st) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.cloud_off_rounded,
+                  size: 48,
+                  color: Colors.grey.shade400,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  state.errorMessage ?? 'Something went wrong',
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: onRefresh,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Retry',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOrdersList(BuildContext context) {
     if (state.status == FarmerOrderStatus.loading) {
       return const Center(
         child: CircularProgressIndicator(

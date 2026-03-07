@@ -1,4 +1,5 @@
 import 'package:farm_express/core/api/api_endpoints.dart';
+import 'package:farm_express/core/services/connectivity/network_info.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/cart/presentation/state/cart_state.dart';
 import 'package:farm_express/features/cart/presentation/view_model/get_cart_view_model.dart';
@@ -38,9 +39,34 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
     if (cartState.status == CartStatus.failure) {
       return Center(
-        child: Text(
-          cartState.errorMessage ?? "Something went wrong",
-          style: const TextStyle(color: Colors.red),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.cloud_off_rounded,
+              size: 48,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              cartState.errorMessage ?? "Something went wrong",
+              style: TextStyle(color: Colors.grey.shade600),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(getCartViewModelProvider.notifier).getCart();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colors.success,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('Retry', style: TextStyle(color: Colors.white)),
+            ),
+          ],
         ),
       );
     }
@@ -314,7 +340,25 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    // Check network connectivity
+                    final networkInfo = ref.read(networkInfoProvider);
+                    final isConnected = await networkInfo.isConnected;
+
+                    if (!isConnected) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            "Please connect to internet to proceed with checkout",
+                          ),
+                          backgroundColor: Colors.red,
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (!mounted) return;
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => PlaceOrderPage()),

@@ -24,7 +24,6 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
   bool _isFetchingMore = false;
   bool _isSearchFocused = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -137,21 +136,6 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
               decoration: BoxDecoration(
                 color: colors.surface,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: _isSearchFocused
-                    ? [
-                        BoxShadow(
-                          color: colors.shadow.withOpacity(0.25),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ]
-                    : [
-                        BoxShadow(
-                          color: colors.shadow.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                 border: Border.all(
                   color: _isSearchFocused ? colors.primary : colors.border,
                   width: 1.5,
@@ -187,6 +171,10 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                           fontWeight: FontWeight.w400,
                         ),
                         border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 14,
@@ -345,6 +333,7 @@ class _SearchProductPageState extends ConsumerState<SearchProductPage> {
                         imagePath: product.productImage,
                         name: product.productName,
                         price: product.price,
+                        unitType: product.unitType,
                       ),
                     );
                   },

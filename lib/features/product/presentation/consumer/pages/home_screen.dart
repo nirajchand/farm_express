@@ -47,11 +47,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
-    _shakeSubscription?.cancel(); 
+    _shakeSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
-
 
   void _onScroll() {
     final maxScroll = _scrollController.position.maxScrollExtent;
@@ -210,6 +209,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       imagePath: product.productImage,
                                       name: product.productName,
                                       price: product.price,
+                                      unitType: product.unitType,
                                     ),
                                   );
                                 },

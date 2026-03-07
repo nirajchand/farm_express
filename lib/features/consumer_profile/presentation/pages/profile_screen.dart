@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:farm_express/core/api/api_endpoints.dart';
 import 'package:farm_express/core/constants/colors.dart';
+import 'package:farm_express/core/services/connectivity/network_info.dart';
+import 'package:farm_express/core/services/image_cache/image_cache_service.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:farm_express/features/consumer_profile/domain/usecases/update_consumer_profile_usecase.dart';
@@ -501,18 +503,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     },
                     child: Stack(
                       children: [
-                        CircleAvatar(
-                          radius: 45,
-                          backgroundImage: _selectedMedia.isNotEmpty
-                              ? FileImage(File(_selectedMedia.first.path))
-                              : (profile?.profileImage != null &&
-                                    profile!.profileImage!.isNotEmpty)
-                              ? NetworkImage(
-                                  ApiEndpoints.serverUrl +
-                                      profile.profileImage!,
-                                )
-                              : AssetImage("assets/images/healthy.jpg")
-                                    as ImageProvider,
+                        _ProfileImageDisplay(
+                          selectedMedia: _selectedMedia,
+                          profileImage: profile?.profileImage,
                         ),
                         Positioned(
                           bottom: 0,
@@ -868,6 +861,69 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ProfileImageDisplay extends ConsumerWidget {
+  final List<XFile> selectedMedia;
+  final String? profileImage;
+
+  const _ProfileImageDisplay({
+    required this.selectedMedia,
+    required this.profileImage,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // If media selected from camera/gallery, use it
+    if (selectedMedia.isNotEmpty) {
+      return CircleAvatar(
+        radius: 45,
+        backgroundImage: FileImage(File(selectedMedia.first.path)),
+      );
+    }
+
+    // If has remote profile image
+    if (profileImage != null && profileImage!.isNotEmpty) {
+      final imageUrl = ApiEndpoints.serverUrl + profileImage!;
+
+      return FutureBuilder<bool>(
+        future: ref.read(networkInfoProvider).isConnected,
+        builder: (context, connectivitySnapshot) {
+          // Online: try to load from network
+          if (connectivitySnapshot.data == true) {
+            return CircleAvatar(
+              radius: 45,
+              backgroundImage: NetworkImage(imageUrl),
+            );
+          }
+
+          // Offline: try to load from cache
+          final cachedFile = ref
+              .read(imageCacheServiceProvider)
+              .getCachedImage(imageUrl);
+
+          if (cachedFile != null) {
+            return CircleAvatar(
+              radius: 45,
+              backgroundImage: FileImage(cachedFile),
+            );
+          }
+
+          // Fallback to default
+          return CircleAvatar(
+            radius: 45,
+            backgroundImage: AssetImage("assets/images/healthy.jpg"),
+          );
+        },
+      );
+    }
+
+    // Default fallback if no profile image
+    return CircleAvatar(
+      radius: 45,
+      backgroundImage: AssetImage("assets/images/healthy.jpg"),
     );
   }
 }

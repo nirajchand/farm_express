@@ -1,5 +1,6 @@
 // farmers_page.dart
 
+import 'package:farm_express/core/services/connectivity/network_info.dart';
 import 'package:farm_express/features/product/presentation/farmer/pages/add_products.dart';
 import 'package:farm_express/features/product/presentation/farmer/pages/update_product.dart';
 import 'package:farm_express/features/product/presentation/farmer/view_model/farmer_product_view_model.dart';
@@ -148,6 +149,23 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
                 ),
               ),
               confirmDismiss: (_) async {
+                // Check internet connection first
+                final isConnected = await ref
+                    .read(networkInfoProvider)
+                    .isConnected;
+                if (!isConnected) {
+                  if (!mounted) return false;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        "Please connect to internet to delete product",
+                      ),
+                      backgroundColor: colors.error,
+                    ),
+                  );
+                  return false;
+                }
+
                 return await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
@@ -203,12 +221,28 @@ class _FarmersPageState extends ConsumerState<FarmersPage> {
                 }
               },
               child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => UpdateProductScreen(product: product),
-                  ),
-                ),
+                onTap: () async {
+                  final isConnected = await ref
+                      .read(networkInfoProvider)
+                      .isConnected;
+                  if (!isConnected) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          "Please connect to internet to update product",
+                        ),
+                        backgroundColor: colors.error,
+                      ),
+                    );
+                    return;
+                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => UpdateProductScreen(product: product),
+                    ),
+                  );
+                },
                 child: ProductCard(
                   imageUrl: product.productImage ?? "",
                   title: product.productName ?? "",

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:farm_express/core/services/connectivity/network_info.dart';
 import 'package:farm_express/core/services/storage/user_session_service.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/farmer_dashboard/presentation/pages/navigation_farmer.dart';
@@ -198,6 +199,16 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   // ---------------- SUBMIT ----------------
 
   Future<void> _submitProduct() async {
+    // Check internet connection first
+    final isConnected = await ref.read(networkInfoProvider).isConnected;
+    if (!isConnected) {
+      SnackbarUtils.showError(
+        context,
+        "Please connect to internet to add product",
+      );
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
     if (_unit == null || _status == null) {
       SnackbarUtils.showError(context, "Select unit and status");

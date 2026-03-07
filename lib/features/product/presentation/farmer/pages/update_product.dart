@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:farm_express/core/api/api_endpoints.dart';
+import 'package:farm_express/core/services/connectivity/network_info.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/product/domain/entities/product_entities.dart';
 import 'package:farm_express/features/product/domain/usecases/update_product_usecases.dart';
@@ -185,6 +186,16 @@ class _UpdateProductScreenState extends ConsumerState<UpdateProductScreen> {
   // ---------- Submit ----------
 
   Future<void> _submit() async {
+    // Check internet connection first
+    final isConnected = await ref.read(networkInfoProvider).isConnected;
+    if (!isConnected) {
+      SnackbarUtils.showError(
+        context,
+        "Please connect to internet to update product",
+      );
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
     if (_unit == null || _status == null) {
       SnackbarUtils.showError(context, "Select unit and status");

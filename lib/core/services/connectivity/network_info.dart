@@ -7,27 +7,30 @@ abstract interface class INetworkInfo {
   Future<bool> get isConnected;
 }
 
-// provider 
+// provider
 final networkInfoProvider = Provider<NetworkInfo>((ref) {
   return NetworkInfo(connectivity: Connectivity());
-}); 
+});
+
+// FutureProvider for watching connectivity in widgets
+final networkInfoFutureProvider = FutureProvider<bool>((ref) async {
+  return ref.watch(networkInfoProvider).isConnected;
+});
 
 class NetworkInfo implements INetworkInfo {
   final Connectivity _connectivity;
 
   NetworkInfo({required Connectivity connectivity})
-      : _connectivity = connectivity;
+    : _connectivity = connectivity;
 
   @override
-  Future<bool> get isConnected async{
-
+  Future<bool> get isConnected async {
     final result = await _connectivity.checkConnectivity(); // wifi / mobiledata
-    if(result.contains(ConnectivityResult.none)){
+    if (result.contains(ConnectivityResult.none)) {
       return false;
-    } 
+    }
 
     return await isInternetAvailable();
-
   }
 
   Future<bool> isInternetAvailable() async {
@@ -40,6 +43,5 @@ class NetworkInfo implements INetworkInfo {
     } on SocketException catch (_) {
       return false;
     }
-
   }
 }

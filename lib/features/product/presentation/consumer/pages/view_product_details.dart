@@ -1,4 +1,5 @@
 import 'package:farm_express/core/api/api_endpoints.dart';
+import 'package:farm_express/core/services/connectivity/network_info.dart';
 import 'package:farm_express/core/utils/snackbar_utils.dart';
 import 'package:farm_express/features/cart/presentation/view_model/get_cart_view_model.dart';
 import 'package:farm_express/features/product/domain/entities/product_entities.dart';
@@ -413,6 +414,18 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                       ? null
                       : () async {
                           try {
+                            // Check internet connectivity first
+                            final networkInfo = ref.read(networkInfoProvider);
+                            final isConnected = await networkInfo.isConnected;
+
+                            if (!isConnected) {
+                              SnackbarUtils.showError(
+                                context,
+                                "No internet connection. Please connect to WiFi or mobile data.",
+                              );
+                              return;
+                            }
+
                             ref
                                 .read(getCartViewModelProvider.notifier)
                                 .addToCart(product.id ?? '', quantity);
